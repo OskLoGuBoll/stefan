@@ -170,7 +170,7 @@
 		union
 		{GLfloat h; GLfloat w; GLfloat a;};
 		#ifdef __cplusplus
-            vec4() {}
+            vec4() : x{}, y{}, z{}, w{} {}
 			vec4(GLfloat x2, GLfloat y2, GLfloat z2, GLfloat w2) : x(x2), y(y2), z(z2), w(w2) {}
 			vec4(GLfloat xyz, GLfloat w2) : x(xyz), y(xyz), z(xyz), w(w2) {}
 			vec4(vec3 v, GLfloat w2) : x(v.x), y(v.y), z(v.z), w(w2) {}
@@ -721,9 +721,12 @@ char transposed = 0;
 		vec3 result;
 
 		norm = (GLfloat)sqrt(a.x * a.x + a.y * a.y + a.z * a.z);
-		result.x = a.x / norm;
-		result.y = a.y / norm;
-		result.z = a.z / norm;
+        if (norm != 0)
+        {
+            result.x = a.x / norm;
+            result.y = a.y / norm;
+            result.z = a.z / norm;
+        }
 		return result;
 	}
 
