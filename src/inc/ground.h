@@ -1,4 +1,7 @@
-#pragma once
+#ifndef GROUND_H
+#define GROUND_H
+#include <LittleOBJLoader.h>
+#include <LoadTGA.h>
 
 Model* GenerateTerrain(TextureData *tex)
 {
@@ -131,3 +134,5 @@ Model* GenerateTerrain(TextureData *tex)
 
 	return model;
 }
+
+#endif

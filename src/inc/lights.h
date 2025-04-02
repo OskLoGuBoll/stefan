@@ -1,3 +1,7 @@
+#ifndef LIGHTS_H
+#define LIGHTS_H
+#include <VectorUtils4.h>
+
 vec3 lightSourcesColorsArr[] = { vec3(1.0f, 1.0f, 1.0f), // Red light
 
                                  vec3(1.0f, 1.0f, 1.0f), // Green light
@@ -18,3 +22,5 @@ vec3 lightSourcesDirectionsPositions[] = { vec3(10.0f, 5.0f, 0.0f), // Red light
                                        vec3(1.0f, 3.0f, 1.0f) }; // White light along Z
 
 GLfloat specularExponent[] = {100.0, 200.0, 60.0};
+
+#endif

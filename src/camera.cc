@@ -12,8 +12,10 @@ void Camera::handleInput(vec2 const& mouseMovedVec)
     yaw += mouseMoved.x;
     yawMatrix = Ry(yaw);
 
-    pitch += pitch + mouseMoved.y < M_PI_2 && pitch + mouseMoved.y > -M_PI_2
+    pitch += pitch + mouseMoved.y < M_PI_2 
+        && pitch + mouseMoved.y > -M_PI_2
         ? mouseMoved.y : 0;
+
     pitchMatrix = Rx(pitch);
 
     updatePosition();
@@ -52,7 +54,7 @@ void Camera::updatePosition()
     position += transpose(yawMatrix) * vec4{movement.x, movement.y, movement.z, 0};
 }
 
-mat4 Camera::getLookAtMat()
+mat4 Camera::getWorldToCamera()
 {
     return pitchMatrix * yawMatrix * T(position.x, position.y, position.z);
 }
