@@ -118,7 +118,7 @@ void display(void)
 	printError("pre display");
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	mat4 worldToCameraSkybox = camera.getLookAtMat();
+	mat4 worldToCameraSkybox = camera.getWorldToCamera();
 	worldToCameraSkybox.m[3] = 0;
 	worldToCameraSkybox.m[7] = 0;
 	worldToCameraSkybox.m[11] = 0;
@@ -134,7 +134,7 @@ void display(void)
 	glUseProgram(program);
 
 	glUniformMatrix4fv(glGetUniformLocation(program, "cameraToView"), 1, GL_TRUE, cameraToView.m);
-	glUniformMatrix4fv(glGetUniformLocation(program, "worldToCamera"), 1, GL_TRUE, camera.getLookAtMat().m);
+	glUniformMatrix4fv(glGetUniformLocation(program, "worldToCamera"), 1, GL_TRUE, camera.getWorldToCamera().m);
 
 	GLfloat specularExponent = 70;
 	vec3 kValues = vec3{0.1,0.9,0};
@@ -259,7 +259,7 @@ float calcHeight(float x, float z)
 
 void calcFrustumPlanesFLR()
 {
-	mat4 frustumInWorld = cameraToView*camera.getLookAtMat();
+	mat4 frustumInWorld = cameraToView*camera.getWorldToCamera();
 	frustumInWorld = inverse(frustumInWorld);
 
 	farPlane = frustumInWorld*vec4{0,0,-1,1};
