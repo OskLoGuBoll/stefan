@@ -8,6 +8,7 @@
 #include "lights.h"
 #include "ground.h"
 #include "camera.h"
+#include "world.h"
 
 #include <cmath>
 #include <algorithm>

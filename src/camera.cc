@@ -59,7 +59,7 @@ mat4 Camera::getWorldToCamera()
     return pitchMatrix * yawMatrix * T(position.x, position.y, position.z);
 }
 
-vec4 Camera::getPosition()
+vec3 Camera::getPosition()
 {
     return position;
 }

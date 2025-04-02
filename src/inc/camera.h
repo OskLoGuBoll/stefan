@@ -18,14 +18,14 @@ public:
     void handleInput(vec2 const&, bool const*);
 
     mat4 getWorldToCamera();
-    vec4 getPosition();
+    vec3 getPosition();
 
 private:
     void updatePosition(bool const*);
 
     mat4 pitchMatrix;
     mat4 yawMatrix;
-    vec4 position;
+    vec3 position;
 
     float pitch;
     float yaw;
