@@ -15,13 +15,13 @@ public:
     Camera& operator=(Camera const&) = default;
     Camera& operator=(Camera &&) = default;
 
-    void handleInput(vec2 const&);
+    void handleInput(vec2 const&, bool const*);
 
     mat4 getWorldToCamera();
     vec4 getPosition();
 
 private:
-    void updatePosition();
+    void updatePosition(bool const*);
 
     mat4 pitchMatrix;
     mat4 yawMatrix;

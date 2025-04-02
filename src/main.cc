@@ -11,6 +11,7 @@
 
 #include <cmath>
 #include <algorithm>
+#include <iostream>
 
 // Globals
 // Data would normally be read from files
@@ -273,7 +274,7 @@ void calcFrustumPlanesFLR()
 
 void logic(void)
 {
-	camera.handleInput(mouseMovedVec);
+	camera.handleInput(mouseMovedVec, keyDown);
     mouseMovedVec = vec2{0,0};
 	worldTime += mouseScrollLength * (glutGet(GLUT_ELAPSED_TIME)-t);
 	t = (GLfloat)glutGet(GLUT_ELAPSED_TIME);

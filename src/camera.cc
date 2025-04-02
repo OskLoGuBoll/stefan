@@ -5,7 +5,7 @@ Camera::Camera()
     pitch{}, yaw{}, movementSpeed{2}, sensitivity{0.001}
 {}
 
-void Camera::handleInput(vec2 const& mouseMovedVec)
+void Camera::handleInput(vec2 const& mouseMovedVec, bool const* keyDown)
 {
     vec2 mouseMoved {mouseMovedVec.x * sensitivity, mouseMovedVec.y * sensitivity};
 
@@ -18,33 +18,33 @@ void Camera::handleInput(vec2 const& mouseMovedVec)
 
     pitchMatrix = Rx(pitch);
 
-    updatePosition();
+    updatePosition(keyDown);
 }
 
-void Camera::updatePosition()
+void Camera::updatePosition(bool const* keyDown)
 {
     vec3 movement {0,0,0}; 
-    if (glutKeyIsDown('w'))
+    if (keyDown['w'])
     {
         movement += vec3{0,0,movementSpeed};
     }       
-    if (glutKeyIsDown('a'))
+    if (keyDown['a'])
     {       
         movement += vec3{movementSpeed,0,0};
     }       
-    if (glutKeyIsDown('s'))
+    if (keyDown['s'])
     {       
         movement += vec3{0,0,-movementSpeed};
     }       
-    if (glutKeyIsDown('d'))
+    if (keyDown['d'])
     {       
         movement += vec3{-movementSpeed,0,0};
     }       
-    if (glutKeyIsDown(' '))
+    if (keyDown[' '])
     {       
         movement += vec3{0,-movementSpeed,0};
     }       
-    if (glutKeyIsDown(GLUT_KEY_CONTROL))
+    if (keyDown[GLUT_KEY_CONTROL])
     {       
         movement += vec3{0,movementSpeed,0};
     }

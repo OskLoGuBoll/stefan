@@ -396,6 +396,11 @@ void doKeyboardEvent(XEvent event, void (*keyProc)(unsigned char key, int x, int
 	char raw = buffer[0]; // Before remapping
 	switch(code)
 	{
+		case 25: buffer[0] = 'w'; break;  // W key
+        case 38: buffer[0] = 'a'; break;  // A key
+        case 39: buffer[0] = 's'; break;  // S key
+        case 40: buffer[0] = 'd'; break;  // D key
+
 		case 111: buffer[0] = GLUT_KEY_UP; break;
 		case 114: buffer[0] = GLUT_KEY_RIGHT; break;
 		case 116: buffer[0] = GLUT_KEY_DOWN; break;
@@ -438,14 +443,21 @@ void doKeyboardEvent(XEvent event, void (*keyProc)(unsigned char key, int x, int
 	if (raw == 0)
 	{
 		if (specialKeyProc)
+		{
 			specialKeyProc(buffer[0], 0, 0);
-		else
-			if (keyProc)
-				keyProc(buffer[0], 0, 0);
+		}
+		else if (keyProc)
+		{
+			keyProc(buffer[0], 0, 0);
+		}
 	}
 	else
+	{
 		if (keyProc)
+		{
 			keyProc(buffer[0], 0, 0);
+		}
+	}
 	gKeymap[(int)buffer[0]] = keyMapValue;
 	
 //	printf("%c %d %d %d\n", buffer[0], buffer[0], r, code);
