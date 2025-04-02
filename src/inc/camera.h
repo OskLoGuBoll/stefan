@@ -17,7 +17,7 @@ public:
 
     void handleInput(vec2 const&);
 
-    mat4 getLookAtMat();
+    mat4 getWorldToCamera();
     vec4 getPosition();
 
 private:
