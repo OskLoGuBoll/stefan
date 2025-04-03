@@ -9,6 +9,7 @@
 #include "ground.h"
 #include "camera.h"
 #include "world.h"
+#include "assetManager.h"
 
 #include <cmath>
 #include <algorithm>
@@ -62,8 +63,12 @@ TextureData ttex; // terrain
 const char* faces[5];
 GLuint cubemapTexture;
 
+AssetManager assets;
+
 void init(void)
 {
+    assets.loadAssets("assets/");
+
 	faces[0] = "assets/newskyboxtex/right.tga";
 	faces[1] = "assets/newskyboxtex/left.tga";
 	faces[3] = "assets/newskyboxtex/top.tga";
@@ -92,8 +97,6 @@ void init(void)
 
 	ball = LoadModel("assets/groundsphere.obj");
 	ballPos = vec2{100,100};
-	
-	LoadTGATextureSimple("assets/windBody.tga", &tex1);
 
 	LoadTGATextureData("assets/fft-terrain.tga", &ttex);
 	tm = GenerateTerrain(&ttex);
@@ -108,7 +111,7 @@ void init(void)
 	glUniform1iv(glGetUniformLocation(program, "isDirectional"), 4, isDirectional);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, tex1);
+	glBindTexture(GL_TEXTURE_2D, assets.getTex("windBody"));
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
 

@@ -16,6 +16,8 @@ public:
     World& operator=(World const&) = delete;
     World& operator=(World &&) = delete;
 
+    void draw();
+
 private:
     ExtModel* terrain;
     Skybox* skybox;

@@ -7,3 +7,7 @@ World::World()
 World::World(ExtModel* model, Skybox* skybox)
 : terrain{model}, skybox{skybox}
 {}
+
+void World::draw()
+{
+}
