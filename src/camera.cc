@@ -1,11 +1,13 @@
-#include "inc/camera.h"
+#include "camera.h"
+#include "VectorUtils4.h"
+#include <vector>
 
 Camera::Camera()
 : pitchMatrix{IdentityMatrix()}, yawMatrix{IdentityMatrix()}, position{},
     pitch{}, yaw{}, movementSpeed{2}, sensitivity{0.001}
 {}
 
-void Camera::handleInput(vec2 const& mouseMovedVec, bool const* keyDown)
+void Camera::handleInput(vec2 const& mouseMovedVec, std::vector<bool>& keyDown)
 {
     vec2 mouseMoved {mouseMovedVec.x * sensitivity, mouseMovedVec.y * sensitivity};
 
@@ -21,7 +23,7 @@ void Camera::handleInput(vec2 const& mouseMovedVec, bool const* keyDown)
     updatePosition(keyDown);
 }
 
-void Camera::updatePosition(bool const* keyDown)
+void Camera::updatePosition(std::vector<bool>& keyDown)
 {
     vec3 movement {0,0,0}; 
     if (keyDown['w'])

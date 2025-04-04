@@ -1,3 +1,4 @@
+/*
 #define MAIN
 #include "GL_utilities.h"
 #include "MicroGlut.h"
@@ -52,7 +53,7 @@ vec4 rightPlane;
 vec4 topPlane;
 vec4 bottomPlane;
 
-bool keyDown[256];
+std::vector<bool> keyDown;
 
 // vertex array object
 Model *m, *m2, *tm;
@@ -307,3 +308,4 @@ int main(int argc, char *argv[])
 	
 	return 0;
 }
+*/
