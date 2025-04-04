@@ -16,13 +16,14 @@ public:
     Camera& operator=(Camera const&) = default;
     Camera& operator=(Camera &&) = default;
 
-    void handleInput(vec2 const&, std::vector<bool>&);
+    void handleInput(vec2 const&, bool const*);
 
     mat4 getWorldToCamera();
+    mat4 getProjectionMat();
     vec3 getPosition();
 
 private:
-    void updatePosition(std::vector<bool>&);
+    void updatePosition(bool const*);
 
     mat4 pitchMatrix;
     mat4 yawMatrix;
@@ -30,6 +31,11 @@ private:
 
     float pitch;
     float yaw;
+
+    float near;
+    float far;
+    float aspect;
+    float fov;
     
     float movementSpeed;
     float sensitivity;

@@ -1,36 +1,37 @@
 #include "skybox.h"
-#include "LoadTGA.h"
-#include "GL_utilities.h"
 
-Skybox::Skybox() : skyboxModel{LoadModel("assets/skybox-full-tweaked.obj")}
+#include <iostream>
+#include <array>
+#include <cassert>
+
+Skybox::Skybox() 
+: ExtModel{LoadModel("assets/skybox-full-tweaked.obj")},
+    basePath{"assets/textures/newskyboxtex/"}, cubeMapTexture{}, nolight{}
 {
-    char const* faces[6];
-    faces[0] = "assets/textures/newskyboxtex/right.tga";
-	faces[1] = "assets/textures/newskyboxtex/left.tga";
-	faces[2] = "assets/textures/newskyboxtex/bottom.tga";
-	faces[3] = "assets/textures/newskyboxtex/top.tga";
-	faces[4] = "assets/textures/newskyboxtex/front.tga";
-	faces[5] = "assets/textures/newskyboxtex/back.tga";
-    cubeMapTexture = LoadTGACubemap(faces);
+    assert(glGetString(GL_VENDOR) != nullptr);  // Crash early if missing
+    initCubemap();
+
     glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapTexture);
     nolight = loadShaders("assets/shaders/lab4-2sky.vert", "assets/shaders/lab4-2sky.frag");
+    if (nolight == 0) {  // Assuming 0 indicates failure
+        std::cout << "Shader compilation failed!" << std::endl;
+    }
 }
 
-Skybox::Skybox(std::string cubeMapFile) : skyboxModel{LoadModel("assets/skybox-full-tweaked.obj")}
+Skybox::Skybox(std::string cubeMapFile)
+: ExtModel{LoadModel("assets/skybox-full-tweaked.obj")},
+    basePath{"assets/textures/" + cubeMapFile + "/"}, cubeMapTexture{}, nolight{}
 {
-    basePath = "assets/textures/" + cubeMapFile + "/";
-    char const* faces[6];
-    faces[0] = (basePath + "right.tga").c_str();
-    faces[1] = (basePath + "left.tga").c_str();
-    faces[2] = (basePath + "bottom.tga").c_str();
-    faces[3] = (basePath + "top.tga").c_str();
-    faces[4] = (basePath + "front.tga").c_str();
-    faces[5] = (basePath + "back.tga").c_str();
-    cubeMapTexture = LoadTGACubemap(faces);
+    assert(glGetString(GL_VENDOR) != nullptr);  // Crash early if missing
+    initCubemap();
+
     glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapTexture);
     nolight = loadShaders("assets/shaders/lab4-2sky.vert", "assets/shaders/lab4-2sky.frag");
+    if (nolight == 0) {  // Assuming 0 indicates failure
+        std::cout << "Shader compilation failed!" << std::endl;
+    }
 }
 
 GLuint Skybox::getCubeMapTexture() {return cubeMapTexture;}
@@ -38,19 +39,14 @@ GLuint Skybox::getCubeMapTexture() {return cubeMapTexture;}
 GLuint Skybox::setCubeMapTexture(std::string cubeMapFile)
 {
     basePath = "assets/textures/" + cubeMapFile + "/";
-    char const* faces[6];
-    faces[0] = (basePath + "right.tga").c_str();
-    faces[1] = (basePath + "left.tga").c_str();
-    faces[2] = (basePath + "bottom.tga").c_str();
-    faces[3] = (basePath + "top.tga").c_str();
-    faces[4] = (basePath + "front.tga").c_str();
-    faces[5] = (basePath + "back.tga").c_str();
-    cubeMapTexture = LoadTGACubemap(faces);
+    initCubemap();
     return cubeMapTexture;
 }
 
-void Skybox::draw(mat4 modelToWorld, mat4 worldToCamera, mat4 cameraToView)
+void Skybox::draw(mat4 const& modelToWorld, mat4 worldToCamera, mat4 const& cameraToView)
 {
+    // THIS IS TEMPORARY //
+    //////////////////////////////////////////////////////
     worldToCamera.m[3] = 0;
 	worldToCamera.m[7] = 0;
 	worldToCamera.m[11] = 0;
@@ -61,6 +57,30 @@ void Skybox::draw(mat4 modelToWorld, mat4 worldToCamera, mat4 cameraToView)
 	glUniform1i(glGetUniformLocation(nolight, "textureUnitCube"), 0);
 	glUniformMatrix4fv(glGetUniformLocation(nolight, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);
 	glDisable(GL_DEPTH_TEST);
-	DrawModel(skyboxModel, nolight, "in_Position", NULL, NULL);
+	DrawModel(model, nolight, "in_Position", NULL, NULL);
 	glEnable(GL_DEPTH_TEST);
+}
+
+void Skybox::initCubemap()
+{
+    std::array<std::string, 6> faces {
+        (basePath + "right.tga"),
+        (basePath + "left.tga"),
+        (basePath + "bottom.tga"),
+        (basePath + "top.tga"),
+        (basePath + "front.tga"),
+        (basePath + "back.tga")
+    };
+
+    std::array<char const*, 6> cFaces {};
+    for (int i {}; i < 6 ; ++i)
+    {
+        cFaces[i] = faces[i].data();
+    }
+
+    cubeMapTexture = LoadTGACubemap(cFaces.data());
+    if (glIsTexture(cubeMapTexture) == GL_FALSE) {
+        std::cout << "Failed to load cubemap textures!" << std::endl;
+        exit(EXIT_FAILURE);
+    }
 }

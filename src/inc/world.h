@@ -8,34 +8,22 @@
 class World
 {
 public:
-    World(vec2&, float&, std::vector<bool>&);
+    World();
     World(World const&) = delete;
     World(World &&) = delete;
-    ~World();
 
     World& operator=(World const&) = delete;
     World& operator=(World &&) = delete;
 
-    void draw();
-    void logic();
-    void display();
-    static void logicWrapper();
-    static void displayWrapper();
+    void draw(mat4 const&, mat4 const&, mat4 const&);
+    Camera& getCamera();
 
-private:
-    static World* instance;
-    ExtModel* terrain;
-    Skybox* skybox;
+private:                
+    ExtModel terrain;
+    Skybox skybox;
+    std::vector<ExtModel> objects;
     Camera camera;
-    float worldTime; //In micro-seconds.
-    float elapsedTime; //In micro-seconds.
-    vec2& mouseMovedVec;
-    float& mouseScrollLength;
-    std::vector<bool>& keyDown;
     GLuint program, nolight;
-    mat4 modelToWorld, worldToCamera, cameraToView;
-    
-
 };
 
 #endif //WORLD_H

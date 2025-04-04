@@ -1,26 +1,37 @@
 #include "demo.h"
 #include "world.h"
+
 #include "MicroGlut.h"
 
-#define SCREEN_WIDTH 2560.0
-#define SCREEN_HEIGHT 1440.0
+#include <iostream>
 
-Demo* Demo::instance = nullptr;
+#define DELTA_T 8.0
 
-Demo::Demo(int argc, char *argv[])
+Demo::Demo(float width, float height)
+: world{}, assets{}, renderer{}, keyDown{}, windowSize{width, height},
+    mouseMovedVec{}, mouseScrollLength{},
+    worldTime{}, elapsedTime{}
 {
+	dumpInfo();
+
+	// GL inits
+
+	printError("GL inits");
     instance = this;
-    glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
-	glutInitContextVersion(3, 2);
-	glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-	glutCreateWindow ("Computer graphics");
 	glutKeyboardFunc(keyboardDownWrapper);
 	glutKeyboardUpFunc(keyboardUpWrapper);
 	glutMouseFunc(mouseClickWrapper);
 	glutPassiveMotionFunc(mouseMovedWrapper);
+    glutLogicFunc(logicWrapper);
+    glutDisplayFunc(displayWrapper);
 
-    World world1{mouseMovedVec, mouseScrollLength, keyDown};
+	glutRepeatingTimer(DELTA_T);
+
+    glClearColor(0.2,0.2,0.5,0);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+
+	glEnable(GL_DEBUG_OUTPUT);
 }
 
 void Demo::run()
@@ -54,9 +65,41 @@ void Demo::mouseClick(int button, int state, int x, int y)
 
 void Demo::mouseMoved(int x, int y)
 {
-	mouseMovedVec.x += x-SCREEN_WIDTH/2;
-	mouseMovedVec.y += y-SCREEN_HEIGHT/2;
-	glutWarpPointer(SCREEN_WIDTH/2,SCREEN_HEIGHT/2);
+	mouseMovedVec.x += x-windowSize.x/2;
+	mouseMovedVec.y += y-windowSize.y/2;
+	glutWarpPointer(windowSize.x/2,windowSize.y/2);
+}
+
+void Demo::logic()
+{
+    float dt {mouseScrollLength * (glutGet(GLUT_ELAPSED_TIME)-elapsedTime)};
+	worldTime += dt;
+	elapsedTime = static_cast<GLuint>(glutGet(GLUT_ELAPSED_TIME));
+
+    world.getCamera().handleInput(mouseMovedVec, keyDown.data());
+    mouseMovedVec = vec2{0,0};
+}
+
+void Demo::display(void)
+{
+    if (!glIsEnabled(GL_DEPTH_TEST)) {
+        std::cout << "OpenGL not initialized!" << std::endl;
+        return;
+    }
+
+	printError("pre display");
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    Camera camera {world.getCamera()};
+	mat4 worldToCamera {camera.getWorldToCamera()};
+    mat4 cameraToView {camera.getProjectionMat()};
+	mat4 modelToWorld = T(0,0,0);
+    
+    world.draw(modelToWorld, worldToCamera, cameraToView);
+
+	//printf("%d %d \n", nr1, nr2);
+	printError("display");
+	glutSwapBuffers();
 }
 
 void Demo::keyboardDownWrapper(unsigned char key, int x, int y)
@@ -77,4 +120,14 @@ void Demo::mouseClickWrapper(int button, int state, int x, int y)
 void Demo::mouseMovedWrapper(int x, int y)
 {
     if (instance) instance->mouseMoved(x, y);
+}
+
+void Demo::logicWrapper()
+{
+    if (instance) instance->logic();
+}
+
+void Demo::displayWrapper()
+{
+    if (instance) instance->display();
 }

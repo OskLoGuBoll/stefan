@@ -4,10 +4,11 @@
 
 Camera::Camera()
 : pitchMatrix{IdentityMatrix()}, yawMatrix{IdentityMatrix()}, position{},
-    pitch{}, yaw{}, movementSpeed{2}, sensitivity{0.001}
+    pitch{}, yaw{}, near{1.f}, far{500.f}, aspect{16.f/9.f}, fov{60},
+    movementSpeed{2}, sensitivity{0.001}
 {}
 
-void Camera::handleInput(vec2 const& mouseMovedVec, std::vector<bool>& keyDown)
+void Camera::handleInput(vec2 const& mouseMovedVec, bool const* keyDown)
 {
     vec2 mouseMoved {mouseMovedVec.x * sensitivity, mouseMovedVec.y * sensitivity};
 
@@ -23,7 +24,7 @@ void Camera::handleInput(vec2 const& mouseMovedVec, std::vector<bool>& keyDown)
     updatePosition(keyDown);
 }
 
-void Camera::updatePosition(std::vector<bool>& keyDown)
+void Camera::updatePosition(bool const* keyDown)
 {
     vec3 movement {0,0,0}; 
     if (keyDown['w'])
@@ -59,6 +60,11 @@ void Camera::updatePosition(std::vector<bool>& keyDown)
 mat4 Camera::getWorldToCamera()
 {
     return pitchMatrix * yawMatrix * T(position.x, position.y, position.z);
+}
+
+mat4 Camera::getProjectionMat()
+{
+    return perspective((M_PI/180) * fov, aspect, near, far);
 }
 
 vec3 Camera::getPosition()

@@ -2,6 +2,11 @@
 #define SKYBOX_H
 
 #include "extModel.h"
+
+#include "LoadTGA.h"
+#include "GL_utilities.h"
+#include "LittleOBJLoader.h"
+
 #include <string>
 #include <vector>
 
@@ -20,10 +25,11 @@ public:
     GLuint getCubeMapTexture();
     GLuint setCubeMapTexture(std::string);
 
-    void draw(mat4, mat4, mat4);
+    void draw(mat4 const&, mat4, mat4 const&);
 
 private:
-    Model* skyboxModel;
+    void initCubemap();
+
     std::string basePath;
     GLuint cubeMapTexture, nolight;
 };
