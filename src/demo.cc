@@ -36,8 +36,8 @@ Demo::Demo(float width, float height)
 
 void Demo::run()
 {
-    glutMainLoop();
     glutHideCursor();
+    glutMainLoop();
 }
 
 void Demo::keyboardUp(unsigned char key, int x, int y)
