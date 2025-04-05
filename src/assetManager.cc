@@ -9,7 +9,7 @@
 namespace fs = std::filesystem;
 
 AssetManager::AssetManager()
-: textures{}
+: textures{}, shaders{}
 {}
 
 void AssetManager::loadAssets(std::string const& assetPath)
@@ -36,7 +36,19 @@ void AssetManager::loadAssets(std::string const& assetPath)
                     LoadTGACubemap(cubemap);
                 }
 
-                std::cout << "Key: " << key << ", Data: " << textures[key] << std::endl;
+                std::cout << "Key: " << key << ", TextureData: " << textures[key] << std::endl;
+            }
+        } else if (filename == assetPath + "shaders")
+        {
+            for (auto const& shader : fs::directory_iterator(filename))
+            {
+                std::cout << shader.path().string() << std::endl;
+                std::string key {shader.path().stem().string()};
+                if (fs::is_regular_file(shader)) {
+                    LoadTGATextureSimple(shader.path().string().c_str(), &shaders[key]);
+                }
+
+                std::cout << "Key: " << key << ", ShaderData: " << shaders[key] << std::endl;
             }
         }
     }
@@ -44,7 +56,12 @@ void AssetManager::loadAssets(std::string const& assetPath)
 }
 
 
-GLuint AssetManager::getTex(std::string const& key)
+GLuint AssetManager::getTexture(std::string const& key)
 {
     return textures[key];
+}
+
+GLuint AssetManager::getShader(std::string const& key)
+{
+    return shaders[key];
 }

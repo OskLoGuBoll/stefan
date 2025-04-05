@@ -19,12 +19,15 @@ public:
     ExtModel& operator=(ExtModel &&) = delete;
 
     void draw(mat4 const&, mat4 const&, mat4 const&, GLuint);
+    void setShader(GLuint&);
+    GLuint& getShader();
 
 private:
     vec3 position;
     std::vector<int> texIDs;
 
 protected:
+    GLuint* shader;
     Model* model;
 };
 

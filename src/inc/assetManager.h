@@ -12,12 +12,14 @@ class AssetManager
 public:
     AssetManager();
     
-    GLuint getTex(std::string const&);
+    GLuint getTexture(std::string const&);
+    GLuint getShader(std::string const&);
 
     void loadAssets(std::string const&);
 
 private:
     std::map<std::string, GLuint> textures;
+    std::map<std::string, GLuint> shaders;
 };
 
 #endif //ASSETMANAGER_H

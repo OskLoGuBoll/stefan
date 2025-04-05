@@ -1,6 +1,7 @@
 #include "world.h"
 #include "GL_utilities.h"
 #include "lights.h"
+#include <iostream>
 
 #define DELTA_T 8.0 // ~120fps with 8.0, ~60fps with 16.0 as target fps.
 

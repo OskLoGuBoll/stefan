@@ -14,7 +14,7 @@ ExtModel::ExtModel()
 }
 
 ExtModel::ExtModel(Model* model)
-: position{}, texIDs{}, model{model}
+: position{}, texIDs{}, model{model}, shader{nullptr}
 {}
 
 ExtModel::~ExtModel()
@@ -37,4 +37,14 @@ void ExtModel::draw(mat4 const& modelToWorld, mat4 const& worldToCamera, mat4 co
                        
     glUniformMatrix4fv(glGetUniformLocation(program, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);                                
     DrawModel(model, program, "in_Position", "in_Normal", "in_TextureCoord");
+}
+
+void ExtModel::setShader(GLuint& shaderIn)
+{
+    shader = &shaderIn;
+}
+
+GLuint& ExtModel::getShader()
+{
+    if (shader != nullptr) return *shader;
 }
