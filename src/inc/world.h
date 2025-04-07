@@ -4,11 +4,12 @@
 #include "extModel.h"
 #include "skybox.h"
 #include "camera.h"
+#include "assetManager.h"
 
 class World
 {
 public:
-    World();
+    World(AssetManager const&);
     World(World const&) = delete;
     World(World &&) = delete;
 
@@ -17,6 +18,9 @@ public:
 
     Camera& getCamera();
     std::vector<ExtModel> const& getObjects() const;
+    void addObject(ExtModel const&);
+    void draw() const;
+    void init(AssetManager const&);
 
 private:
     ExtModel terrain;

@@ -57,17 +57,17 @@ void Camera::updatePosition(bool const* keyDown)
     position += transpose(yawMatrix) * vec4{movement.x, movement.y, movement.z, 0};
 }
 
-mat4 Camera::getWorldToCamera()
+mat4 Camera::getWorldToCamera() const
 {
     return pitchMatrix * yawMatrix * T(position.x, position.y, position.z);
 }
 
-mat4 Camera::getProjectionMat()
+mat4 Camera::getProjectionMat() const
 {
     return perspective((M_PI/180) * fov, aspect, near, far);
 }
 
-vec3 Camera::getPosition()
+vec3 Camera::getPosition() const
 {
     return position;
 }

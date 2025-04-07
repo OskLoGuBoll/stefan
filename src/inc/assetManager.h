@@ -3,7 +3,7 @@
 
 #include "LoadTGA.h"
 #include "LittleOBJLoader.h"
-#include "world.h"
+#include "GL_utilities.h"
 
 #include <map>
 #include <string>
@@ -11,18 +11,18 @@
 class AssetManager
 {
 public:
-    AssetManager();
+    AssetManager(std::string const&);
     
-    GLuint getTexture(std::string const&);
-    GLuint getShader(std::string const&);
+    GLuint getTexture(std::string const&) const;
+    GLuint getShader(std::string const&) const;
+    Model* getModel(std::string const&) const;
 
     void loadAssets(std::string const&);
-
-    void draw(World&);
 
 private:
     std::map<std::string, GLuint> textures;
     std::map<std::string, GLuint> shaders;
+    std::map<std::string, Model*> models;
 };
 
 #endif //ASSETMANAGER_H

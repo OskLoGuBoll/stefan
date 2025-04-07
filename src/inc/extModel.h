@@ -3,32 +3,36 @@
 
 #include "VectorUtils4.h"
 #include "LittleOBJLoader.h"
+#include "assetManager.h"
 
 #include <vector>
 
 class ExtModel
 {
 public:
-    ExtModel();
-    ExtModel(Model*);
-    ExtModel(ExtModel const&) = delete;
-    ExtModel(ExtModel &&) = delete;
-    ~ExtModel();
+    ExtModel(AssetManager const&);
+    ExtModel(Model*, GLuint const);
+    ExtModel(ExtModel const&) = default;
+    ExtModel(ExtModel &&) = default;
+    ~ExtModel() = default;
 
-    ExtModel& operator=(ExtModel const&) = delete;
-    ExtModel& operator=(ExtModel &&) = delete;
+    ExtModel& operator=(ExtModel const&) = default;
+    ExtModel& operator=(ExtModel &&) = default;
 
-    void draw(mat4 const&, mat4 const&, mat4 const&, GLuint);
-    void setShader(GLuint&);
-    GLuint& getShader();
+    void draw(mat4 const&, mat4 const&) const;
+    void setShader(GLuint const);
+    GLuint getShader() const;
+
+    mat4 getModelToWorld() const;
+    Model* getModel() const;
 
 private:
     vec3 position;
     std::vector<int> texIDs;
 
 protected:
-    GLuint* shader;
     Model* model;
+    GLuint shader;
 };
 
 #endif //EXTMODEL_H

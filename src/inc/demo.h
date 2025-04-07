@@ -39,8 +39,8 @@ private:
 
     static inline Demo* instance = nullptr;
 
+    AssetManager assets;
     World world;
-    AssetManager renderer;
 
     std::array<bool, 256> keyDown;
     vec2 windowSize;

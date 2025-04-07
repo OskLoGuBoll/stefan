@@ -18,9 +18,9 @@ public:
 
     void handleInput(vec2 const&, bool const*);
 
-    mat4 getWorldToCamera();
-    mat4 getProjectionMat();
-    vec3 getPosition();
+    mat4 getWorldToCamera() const;
+    mat4 getProjectionMat() const;
+    vec3 getPosition() const;
 
 private:
     void updatePosition(bool const*);

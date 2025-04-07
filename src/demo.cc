@@ -8,7 +8,7 @@
 #define DELTA_T 8.0
 
 Demo::Demo(float width, float height)
-: world{}, renderer{}, keyDown{}, windowSize{width, height},
+: assets{"assets/"}, world{assets}, keyDown{}, windowSize{width, height},
     mouseMovedVec{}, mouseScrollLength{},
     worldTime{}, elapsedTime{}
 {
@@ -33,7 +33,7 @@ Demo::Demo(float width, float height)
 
 	glEnable(GL_DEBUG_OUTPUT);
 
-    renderer.loadAssets("assets/");
+    world.addObject(ExtModel{assets});
 }
 
 void Demo::run()
@@ -92,7 +92,7 @@ void Demo::display(void)
 	printError("pre display");
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    renderer.draw(world);
+    world.draw();
 
 	//printf("%d %d \n", nr1, nr2);
 	printError("display");

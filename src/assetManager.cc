@@ -8,9 +8,11 @@
 
 namespace fs = std::filesystem;
 
-AssetManager::AssetManager()
-: textures{}, shaders{}
-{}
+AssetManager::AssetManager(std::string const& path)
+: textures{}, shaders{}, models{}
+{
+    loadAssets(path);
+}
 
 void AssetManager::loadAssets(std::string const& assetPath)
 {
@@ -18,39 +20,64 @@ void AssetManager::loadAssets(std::string const& assetPath)
     for (auto const& file : fs::directory_iterator(assetPath))
     {
         std::string filename {file.path().string()};
-        std::cout << filename << std::endl;
 
         if (filename == assetPath + "textures")
         {
             for (auto const& texture : fs::directory_iterator(filename))
             {
-                std::cout << texture.path().string() << std::endl;
                 std::string key {texture.path().stem().string()};
-                if (fs::is_regular_file(texture)) {
+                if (fs::is_regular_file(texture))
+                {
                     LoadTGATextureSimple(texture.path().string().c_str(), &textures[key]);
                 }
                 else
                 {
-                    std::cout << "cubemap" << std::endl;
-                    char const* cubemap[5] {};
-                    //LoadTGACubemap(cubemap);
-                }
+                    std::array<std::string, 6> faces {
+                        (texture.path().string() + "/right.tga"),
+                        (texture.path().string() + "/left.tga"),
+                        (texture.path().string() + "/bottom.tga"),
+                        (texture.path().string() + "/top.tga"),
+                        (texture.path().string() + "/front.tga"),
+                        (texture.path().string() + "/back.tga")
+                    };
 
-                std::cout << "Key: " << key << ", TextureData: " << textures[key] << std::endl;
+                    std::array<char const*, 6> cFaces {};
+                    for (int i {}; i < 6 ; ++i)
+                    {
+                        cFaces[i] = faces[i].data();
+                    }
+
+                    textures[key] = LoadTGACubemap(cFaces.data());
+                    if (glIsTexture(textures[key]) == GL_FALSE) {
+                        std::cout << "Failed to load cubemap textures!" << std::endl;
+                        exit(EXIT_FAILURE);
+                    }
+                }
             }
-        } else if (filename == assetPath + "shaders")
+        } 
+        else if (filename == assetPath + "shaders")
         {
             for (auto const& shader : fs::directory_iterator(filename))
             {
-                std::cout << shader.path().string() << std::endl;
                 std::string key {shader.path().stem().string()};
 
                 if (fs::is_regular_file(shader) && shaders[key] == 0) {
                     shaders[key] = loadShaders((assetPath + "shaders/" + key + ".vert").c_str(),
                                                (assetPath + "shaders/" + key + ".frag").c_str());
                 }
+            }
+        }
+        else if (filename == assetPath + "models")
+        {
+            for (auto const& model : fs::directory_iterator(filename))
+            {
+                std::string key {model.path().stem().string()};
+                std::string modelPath {model.path().string()};
 
-                std::cout << "Key: " << key << ", ShaderData: " << shaders[key] << std::endl;
+                if (fs::is_regular_file(model))
+                {
+                    models[key] = LoadModel(modelPath.c_str());
+                }
             }
         }
     }
@@ -58,25 +85,17 @@ void AssetManager::loadAssets(std::string const& assetPath)
 }
 
 
-GLuint AssetManager::getTexture(std::string const& key)
+GLuint AssetManager::getTexture(std::string const& key) const
 {
-    return textures[key];
+    return textures.at(key);
 }
 
-GLuint AssetManager::getShader(std::string const& key)
+GLuint AssetManager::getShader(std::string const& key) const
 {
-    return shaders[key];
+    return shaders.at(key);
 }
 
-void AssetManager::draw(World& world)
+Model* AssetManager::getModel(std::string const& key) const
 {
-    Camera camera {world.getCamera()};
-	mat4 worldToCamera {camera.getWorldToCamera()};
-    mat4 cameraToView {camera.getProjectionMat()};
-    
-    
-    for (auto const& object : world.getObjects())
-    {
-        
-    }
+    return models.at(key);
 }
