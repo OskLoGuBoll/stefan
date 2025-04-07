@@ -33,7 +33,7 @@ void AssetManager::loadAssets(std::string const& assetPath)
                 {
                     std::cout << "cubemap" << std::endl;
                     char const* cubemap[5] {};
-                    LoadTGACubemap(cubemap);
+                    //LoadTGACubemap(cubemap);
                 }
 
                 std::cout << "Key: " << key << ", TextureData: " << textures[key] << std::endl;
@@ -44,8 +44,10 @@ void AssetManager::loadAssets(std::string const& assetPath)
             {
                 std::cout << shader.path().string() << std::endl;
                 std::string key {shader.path().stem().string()};
-                if (fs::is_regular_file(shader)) {
-                    LoadTGATextureSimple(shader.path().string().c_str(), &shaders[key]);
+
+                if (fs::is_regular_file(shader) && shaders[key] == 0) {
+                    shaders[key] = loadShaders((assetPath + "shaders/" + key + ".vert").c_str(),
+                                               (assetPath + "shaders/" + key + ".frag").c_str());
                 }
 
                 std::cout << "Key: " << key << ", ShaderData: " << shaders[key] << std::endl;
@@ -64,4 +66,17 @@ GLuint AssetManager::getTexture(std::string const& key)
 GLuint AssetManager::getShader(std::string const& key)
 {
     return shaders[key];
+}
+
+void AssetManager::draw(World& world)
+{
+    Camera camera {world.getCamera()};
+	mat4 worldToCamera {camera.getWorldToCamera()};
+    mat4 cameraToView {camera.getProjectionMat()};
+    
+    
+    for (auto const& object : world.getObjects())
+    {
+        
+    }
 }

@@ -8,7 +8,7 @@
 #define DELTA_T 8.0
 
 Demo::Demo(float width, float height)
-: world{}, assets{}, renderer{}, keyDown{}, windowSize{width, height},
+: world{}, renderer{}, keyDown{}, windowSize{width, height},
     mouseMovedVec{}, mouseScrollLength{},
     worldTime{}, elapsedTime{}
 {
@@ -32,6 +32,8 @@ Demo::Demo(float width, float height)
 	glEnable(GL_DEPTH_TEST);
 
 	glEnable(GL_DEBUG_OUTPUT);
+
+    renderer.loadAssets("assets/");
 }
 
 void Demo::run()
@@ -90,12 +92,7 @@ void Demo::display(void)
 	printError("pre display");
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    Camera camera {world.getCamera()};
-	mat4 worldToCamera {camera.getWorldToCamera()};
-    mat4 cameraToView {camera.getProjectionMat()};
-	mat4 modelToWorld = T(0,0,0);
-    
-    world.draw(modelToWorld, worldToCamera, cameraToView);
+    renderer.draw(world);
 
 	//printf("%d %d \n", nr1, nr2);
 	printError("display");

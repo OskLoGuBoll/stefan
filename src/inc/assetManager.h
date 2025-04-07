@@ -3,6 +3,7 @@
 
 #include "LoadTGA.h"
 #include "LittleOBJLoader.h"
+#include "world.h"
 
 #include <map>
 #include <string>
@@ -16,6 +17,8 @@ public:
     GLuint getShader(std::string const&);
 
     void loadAssets(std::string const&);
+
+    void draw(World&);
 
 private:
     std::map<std::string, GLuint> textures;

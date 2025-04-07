@@ -15,10 +15,10 @@ public:
     World& operator=(World const&) = delete;
     World& operator=(World &&) = delete;
 
-    void draw(mat4 const&, mat4 const&, mat4 const&);
     Camera& getCamera();
+    std::vector<ExtModel> const& getObjects() const;
 
-private:                
+private:
     ExtModel terrain;
     Skybox skybox;
     std::vector<ExtModel> objects;

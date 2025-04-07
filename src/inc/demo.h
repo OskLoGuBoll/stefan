@@ -7,7 +7,6 @@
 
 #include "world.h"
 #include "assetManager.h"
-#include "renderer.h"
 
 class Demo
 {
@@ -41,8 +40,7 @@ private:
     static inline Demo* instance = nullptr;
 
     World world;
-    AssetManager assets;
-    Renderer renderer;
+    AssetManager renderer;
 
     std::array<bool, 256> keyDown;
     vec2 windowSize;
