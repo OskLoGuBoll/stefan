@@ -8,7 +8,7 @@
 class Camera
 {
 public:
-    Camera();
+    Camera(vec3 const& = 0);
     Camera(Camera const&) = default;
     Camera(Camera &&) = default;
     ~Camera() = default;

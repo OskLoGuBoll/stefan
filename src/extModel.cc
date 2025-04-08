@@ -1,11 +1,11 @@
 #include "extModel.h"
 
-ExtModel::ExtModel(AssetManager const& assets)
-: position{}, texIDs{}, model{assets.getModel("groundsphere")}, shader{assets.getShader("lab4-2")}
+ExtModel::ExtModel(AssetManager const& assets, vec3 const& position)
+: position{position}, texIDs{}, model{assets.getModel("groundsphere")}, shader{assets.getShader("lab4-2")}
 {}
 
-ExtModel::ExtModel(Model* model, GLuint const shader)
-: position{}, texIDs{}, model{model}, shader{shader}
+ExtModel::ExtModel(Model* model, GLuint const shader, vec3 const& position)
+: position{position}, texIDs{}, model{model}, shader{shader}
 {}
 
 void ExtModel::draw(mat4 const& worldToCamera, mat4 const& cameraToView) const

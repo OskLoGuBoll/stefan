@@ -25,4 +25,10 @@ private:
     std::map<std::string, Model*> models;
 };
 
+struct Drawable
+{
+    Model* model;
+    GLuint shader;
+};
+
 #endif //ASSETMANAGER_H

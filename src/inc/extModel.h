@@ -10,8 +10,8 @@
 class ExtModel
 {
 public:
-    ExtModel(AssetManager const&);
-    ExtModel(Model*, GLuint const);
+    ExtModel(AssetManager const&, vec3 const& = 0);
+    ExtModel(Model*, GLuint const, vec3 const& = 0);
     ExtModel(ExtModel const&) = default;
     ExtModel(ExtModel &&) = default;
     ~ExtModel() = default;

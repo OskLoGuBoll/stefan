@@ -51,6 +51,6 @@ void main(void)
 	}
 	// Ambient
 	shading += vec4(kValues.x,kValues.x,kValues.x,0);
-	out_Color = texture(textureUnit, ex_TextureCoord) * shading;
+	out_Color = texture(textureUnit, ex_TextureCoord*10) * shading;
 	//out_Color = vec4(ex_Normal,0);
 }

@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <filesystem>
+#include <array>
 
 #include <iostream>
 #include <array>

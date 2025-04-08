@@ -5,7 +5,7 @@
 #include "lights.h"
 
 World::World(AssetManager const& assets)
-: terrain{assets.getModel("fft-terrain_hm"), assets.getShader("lab4-2")}, skybox{assets}, objects{}, camera{}, program{}, nolight{}
+: terrain{assets.getModel("Ground"), assets.getShader("lab4-2")}, skybox{assets}, objects{}, camera{}, program{}, nolight{}
 {
     // Just for test
     addObject("ball2", std::make_unique<ExtModel>(assets));

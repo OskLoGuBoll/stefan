@@ -4,10 +4,10 @@
 
 #include <iostream>
 
-Camera::Camera()
-: pitchMatrix{IdentityMatrix()}, yawMatrix{IdentityMatrix()}, position{},
+Camera::Camera(vec3 const& position)
+: pitchMatrix{IdentityMatrix()}, yawMatrix{IdentityMatrix()}, position{position},
     pitch{}, yaw{}, near{1.f}, far{500.f}, aspect{16.f/9.f}, fov{60},
-    movementSpeed{2}, sensitivity{0.001}
+    movementSpeed{1}, sensitivity{0.001}
 {}
 
 void Camera::handleInput(vec2 const& mouseMovedVec, bool const* keyDown)
