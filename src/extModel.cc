@@ -43,7 +43,8 @@ Model* ExtModel::getModel() const
     return model;
 }
 
-void ExtModel::setPosition()
+// Implemented just for test.
+void ExtModel::setPosition(double const speed)
 {
-    position.x += 0.05;
+    position.x += speed;
 }

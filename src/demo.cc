@@ -32,6 +32,8 @@ Demo::Demo(float width, float height)
 	glEnable(GL_DEPTH_TEST);
 
 	glEnable(GL_DEBUG_OUTPUT);
+
+    // Just for test
     world.addObject("ball1",std::make_unique<ExtModel>(assets));
 }
 
@@ -92,8 +94,11 @@ void Demo::display(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     world.draw();
-    world.getObject("ball1")->setPosition();
-    std::cout<<world.getObject("ball1")->getModelToWorld().m[3]<<std::endl;
+
+    // This is just a test
+    world.getObject("ball1")->setPosition(0.05);
+    world.getObject("ball2")->setPosition(0.01);
+    //std::cout<<world.getObject("ball1")->getModelToWorld().m[3]<<std::endl;
 
 	//printf("%d %d \n", nr1, nr2);
 	printError("display");
