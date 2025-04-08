@@ -5,7 +5,7 @@
 #include "lights.h"
 
 World::World(AssetManager const& assets)
-: terrain{assets}, skybox{assets}, objects{}, camera{}, program{}, nolight{}
+: terrain{assets.getModel("fft-terrain_hm"), assets.getShader("lab4-2")}, skybox{assets}, objects{}, camera{}, program{}, nolight{}
 {}
 
 Camera& World::getCamera()

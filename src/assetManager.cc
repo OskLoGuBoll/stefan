@@ -6,6 +6,8 @@
 
 #include <iostream>
 
+#include "ground.h"
+
 namespace fs = std::filesystem;
 
 AssetManager::AssetManager(std::string const& path)
@@ -26,7 +28,13 @@ void AssetManager::loadAssets(std::string const& assetPath)
             for (auto const& texture : fs::directory_iterator(filename))
             {
                 std::string key {texture.path().stem().string()};
-                if (fs::is_regular_file(texture))
+                if (fs::is_regular_file(texture) && key.find("hm") != std::string::npos)
+                {
+                    TextureData terrain {};
+                    LoadTGATextureData(texture.path().string().c_str(), &terrain);
+                    models[key] = GenerateTerrain(&terrain);
+                }
+                else if (fs::is_regular_file(texture))
                 {
                     LoadTGATextureSimple(texture.path().string().c_str(), &textures[key]);
                 }

@@ -2,6 +2,8 @@
 #include "VectorUtils4.h"
 #include <vector>
 
+#include <iostream>
+
 Camera::Camera()
 : pitchMatrix{IdentityMatrix()}, yawMatrix{IdentityMatrix()}, position{},
     pitch{}, yaw{}, near{1.f}, far{500.f}, aspect{16.f/9.f}, fov{60},

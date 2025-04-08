@@ -1,8 +1,5 @@
 #include "extModel.h"
 
-#include "LoadTGA.h"
-#include "ground.h"
-
 ExtModel::ExtModel(AssetManager const& assets)
 : position{}, texIDs{}, model{assets.getModel("groundsphere")}, shader{assets.getShader("lab4-2")}
 {}
@@ -13,8 +10,6 @@ ExtModel::ExtModel(Model* model, GLuint const shader)
 
 void ExtModel::draw(mat4 const& worldToCamera, mat4 const& cameraToView) const
 {
-    // THIS IS TEMPORARY //
-    //////////////////////////////////////////////////////
     glUseProgram(shader);
     glUniformMatrix4fv(glGetUniformLocation(shader, "cameraToView"), 1, GL_TRUE, cameraToView.m);                                                
     glUniformMatrix4fv(glGetUniformLocation(shader, "worldToCamera"), 1, GL_TRUE, worldToCamera.m);

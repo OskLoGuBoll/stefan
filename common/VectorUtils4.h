@@ -111,6 +111,10 @@
 #include <math.h>
 #include <stdio.h>
 
+#ifdef __cplusplus
+#include <ostream>
+#endif
+
 
 #ifndef M_PI
 #define M_PI           3.14159265358979323846
@@ -170,7 +174,7 @@
 		union
 		{GLfloat h; GLfloat w; GLfloat a;};
 		#ifdef __cplusplus
-            vec4() : x{}, y{}, z{}, w{} {}
+            vec4() : x{0}, y{0}, z{0}, w{0} {}
 			vec4(GLfloat x2, GLfloat y2, GLfloat z2, GLfloat w2) : x(x2), y(y2), z(z2), w(w2) {}
 			vec4(GLfloat xyz, GLfloat w2) : x(xyz), y(xyz), z(xyz), w(w2) {}
 			vec4(vec3 v, GLfloat w2) : x(v.x), y(v.y), z(v.z), w(w2) {}
@@ -188,7 +192,7 @@
 		{GLfloat y; GLfloat t;};
 		
 		#ifdef __cplusplus
-            vec2() {}
+            vec2() : x{0}, y{0} {}
 			vec2(GLfloat x2, GLfloat y2) : x(x2), y(y2) {}
 		#endif
 	} vec2, *vec2Ptr;
@@ -198,7 +202,7 @@
 	{
 		GLfloat m[16];
 		#ifdef __cplusplus
-            mat4() {}
+            mat4() : m{} {}
 			mat4(GLfloat x2)
 			{
 				m[0] = x2; m[1] = 0; m[2] = 0; m[3] = 0;
@@ -511,6 +515,26 @@ inline
 void operator/=(vec4 &a, const float &b) // vec4 /= scalar
 {
 	a = a / b;
+}
+
+inline
+std::ostream& operator<<(std::ostream& os, mat4 const& m)
+{
+    os << '[';
+    for (unsigned i {}; i < 16; i++)
+    {
+        if (i % 4 == 0) os << "\n";
+        os << m.m[i] << ", ";
+    }
+    os << ']';
+    return os;
+}
+
+inline
+std::ostream& operator<<(std::ostream& os, vec3 const& v)
+{
+    os << '[' << v.x << ", " << v.y << ", " << v.z << ']';
+    return os;
 }
 
 // --- Matrix multiplication ---
@@ -1673,6 +1697,7 @@ mat4 lookAt(vec3 p, vec3 l, vec3 u)
 		m[8]  = x.m[6]; m[9]  = x.m[7]; m[10] = x.m[8]; m[11] = 0;
 		m[12] = 0;      m[13] = 0;      m[14] = 0;      m[15] = 1;
 	}
+
 #endif
 
 
