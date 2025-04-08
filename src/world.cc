@@ -13,14 +13,18 @@ Camera& World::getCamera()
     return camera;
 }
 
-std::vector<ExtModel> const& World::getObjects() const
+std::unordered_map<std::string,std::unique_ptr<ExtModel>> const& World::getObjects() const
 {
     return objects;
 }
 
-void World::addObject(ExtModel const& object)
-{
-    objects.push_back(object);
+void World::addObject(const std::string& objectName, std::unique_ptr<ExtModel> object) {
+    objects[objectName] = std::move(object);; // overwrites if key exists
+}
+
+ExtModel* World::getObject(const std::string& objectName) {
+    auto object = objects.find(objectName);
+    return (object != objects.end()) ? object->second.get() : nullptr;
 }
 
 void World::draw() const
@@ -31,16 +35,15 @@ void World::draw() const
     skybox.draw(worldToCamera, cameraToView);
     terrain.draw(worldToCamera, cameraToView);
 
-    for (auto const& object : objects)
+    for (const auto& object : objects)
     {
-        GLuint program = object.getShader();
+        GLuint program = object.second->getShader();
 
         glUseProgram(program);
         glUniform3fv(glGetUniformLocation(program, "lightSourcesDirPosArr"), 4, &lightSourcesDirectionsPositions[0].x);
         glUniform3fv(glGetUniformLocation(program, "lightSourcesColorArr"), 4, &lightSourcesColorsArr[0].x);
         glUniform1iv(glGetUniformLocation(program, "isDirectional"), 4, isDirectional);
 
-        object.draw(worldToCamera, cameraToView);
+        object.second->draw(worldToCamera, cameraToView);
     }
-
 }

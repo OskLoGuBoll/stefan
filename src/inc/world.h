@@ -5,6 +5,8 @@
 #include "skybox.h"
 #include "camera.h"
 #include "assetManager.h"
+#include <unordered_map>
+#include <memory>
 
 class World
 {
@@ -17,15 +19,17 @@ public:
     World& operator=(World &&) = delete;
 
     Camera& getCamera();
-    std::vector<ExtModel> const& getObjects() const;
-    void addObject(ExtModel const&);
+    std::unordered_map<std::string,std::unique_ptr<ExtModel>> const& getObjects() const;
+    void addObject(const std::string&, std::unique_ptr<ExtModel>);
     void draw() const;
     void init(AssetManager const&);
+
+    ExtModel* getObject(const std::string& key);
 
 private:
     ExtModel terrain;
     Skybox skybox;
-    std::vector<ExtModel> objects;
+    std::unordered_map<std::string,std::unique_ptr<ExtModel>> objects;
     Camera camera;
     GLuint program, nolight;
 };

@@ -5,6 +5,7 @@
 #include <filesystem>
 
 #include <iostream>
+#include <array>
 
 #include "ground.h"
 

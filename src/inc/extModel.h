@@ -26,6 +26,7 @@ public:
     mat4 getModelToWorld() const;
     Model* getModel() const;
 
+    void setPosition();
 private:
     vec3 position;
     std::vector<int> texIDs;

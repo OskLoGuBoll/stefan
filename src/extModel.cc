@@ -42,3 +42,8 @@ Model* ExtModel::getModel() const
 {
     return model;
 }
+
+void ExtModel::setPosition()
+{
+    position.x += 0.05;
+}
