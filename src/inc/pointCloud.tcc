@@ -1,46 +1,40 @@
 
 template <size_t N>
-PointCloud<N>::PointCloud(std::string filePath)
+PointCloud<N>::PointCloud(std::string const& filePath)
 : mesh{}, tree{}, insideTester{nullptr}
 {
-    std::cout<<"00"<<std::endl;
-
-    LoadMesh("assets/models/groundspherecopy.obj");
+    LoadMesh(filePath);
     BuildAABBTree();
     RandomSampling();
 }
 
 template <size_t N>
-int PointCloud<N>::LoadMesh(std::string filePath)
+int PointCloud<N>::LoadMesh(std::string const& filePath)
 {
-    std::ifstream input(filePath);
-    if (!CGAL::IO::read_OBJ(input, mesh)) {
-        std::cerr << "❌ Failed to parse mesh from: " << filePath << std::endl;
-        std::cout << "CGAL version: " << CGAL_VERSION_NR << std::endl;
+    std::string target{filePath + ".triangulated.obj"};
+
+    obj::Triangulate obj {};
+
+	const auto triangulated = obj.triangulate(filePath, target);
+
+	if(!triangulated)
+    {
+        std::cerr << "Failed to triangulate mesh: " << filePath << std::endl;
+        return 1;
     }
 
-    for (auto v : mesh.vertices()) {
-        auto pt = mesh.point(v);
-        std::cout << "Vertex: " << pt << std::endl;
-    }
+    std::ifstream input{target};
     
-    for (auto f : mesh.faces()) {
-        std::cout << "Face: ";
-        for (auto v : vertices_around_face(mesh.halfedge(f), mesh)) {
-            std::cout << v << " ";
-        }
-        std::cout << std::endl;
+    if (!CGAL::IO::read_OBJ(input, mesh)) {
+        std::cerr << "❌ Failed to parse mesh from: " << target << std::endl;
+        std::cout << "CGAL version: " << CGAL_VERSION_NR << std::endl;
+        return 1;
     }
-    
 
     if (mesh.is_empty()) {
         std::cerr << "❌ Mesh loaded but is empty!" << std::endl;
+        return 1;
     }
-    
-    std::cout << "✅ Mesh loaded from " << filePath << ", #vertices = "
-              << mesh.number_of_vertices() << ", #faces = "
-              << mesh.number_of_faces() << std::endl;
-
 
     return 0;
 }
@@ -67,18 +61,18 @@ void PointCloud<N>::RandomSampling()
     for (int i = 0; i < N; ++i) {
         Point p(x_dist(rng), y_dist(rng), z_dist(rng));
         if ((*insideTester)(p) == CGAL::ON_BOUNDED_SIDE) {
-            pointCloud[j]=p;
+            pointCloud[j] = vec3{p.x(), p.y(), p.z()};
             j++;
         }
     }
 }
 
 template <size_t N>
-void PointCloud<N>::SaveToFile(std::string filePath)
+void PointCloud<N>::SaveToFile(std::string const& filePath)
 {
-    std::ofstream out(filePath);
-    for (const Point& p : pointCloud) 
+    std::ofstream out {filePath};
+    for (auto const& p : pointCloud) 
     {
-        out << p.x() << " " << p.y() << " " << p.z() << "\n";
+        out << p.x << " " << p.y << " " << p.z << "\n";
     }
 }

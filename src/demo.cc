@@ -36,9 +36,8 @@ Demo::Demo(float width, float height)
 
     // Just for test
     world.addObject("ball1",std::make_unique<ExtModel>(assets));
-    std::cout<<"wow"<<std::endl;
 
-    PointCloud<10000> pc{"dd"};
+    PointCloud<10000> pc{"assets/models/groundsphere.obj"};
     pc.SaveToFile("assets/pc.xyz");
 
 }

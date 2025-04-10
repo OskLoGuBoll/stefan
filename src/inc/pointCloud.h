@@ -16,6 +16,7 @@
 
 #include "VectorUtils4.h"
 #include "assetManager.h"
+#include "TriangulateOBJ.h"
 
 
 template <size_t N>
@@ -31,21 +32,21 @@ public:
     typedef CGAL::Side_of_triangle_mesh<Mesh, Kernel>       PointInside;
     typedef CGAL::Bbox_3                                    BoundingBox;
 
-    PointCloud(std::string filePath);
+    PointCloud(std::string const& filePath);
 
     ~PointCloud() = default;
     PointCloud(const PointCloud& other) = default;
     PointCloud& operator=(const PointCloud& other) = default;
     PointCloud(PointCloud&& other) = default;
     PointCloud& operator=(PointCloud&& other) = default;
-    void SaveToFile(std::string);
+    void SaveToFile(std::string const&);
 
 private:
-    int LoadMesh(std::string);
+    int LoadMesh(std::string const&);
     void BuildAABBTree();
     void RandomSampling();
 
-    std::array<Point, N> pointCloud;
+    std::array<vec3, N> pointCloud;
     std::vector<float> radii;
     std::vector<vec4> colors;
 

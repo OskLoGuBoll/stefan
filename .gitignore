@@ -32,5 +32,6 @@
 
 .vscode
 *.xyz
+*.triangulated.obj
 
 stefan
