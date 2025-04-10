@@ -31,5 +31,6 @@
 *.app
 
 .vscode
+*.xyz
 
 stefan

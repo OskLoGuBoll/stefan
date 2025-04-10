@@ -2,6 +2,7 @@
 #include "world.h"
 
 #include "MicroGlut.h"
+#include "pointCloud.h"
 
 #include <iostream>
 
@@ -35,6 +36,11 @@ Demo::Demo(float width, float height)
 
     // Just for test
     world.addObject("ball1",std::make_unique<ExtModel>(assets));
+    std::cout<<"wow"<<std::endl;
+
+    PointCloud<10000> pc{"dd"};
+    pc.SaveToFile("assets/pc.xyz");
+
 }
 
 void Demo::run()

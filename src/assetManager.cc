@@ -83,8 +83,12 @@ void AssetManager::loadAssets(std::string const& assetPath)
             {
                 std::string key {model.path().stem().string()};
                 std::string modelPath {model.path().string()};
+                
+                if (fs::is_regular_file(model) && key.find("copy") != std::string::npos)
+                {
 
-                if (fs::is_regular_file(model))
+                }
+                else if (fs::is_regular_file(model))
                 {
                     models[key] = LoadModel(modelPath.c_str());
                 }
