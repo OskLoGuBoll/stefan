@@ -41,6 +41,8 @@ public:
     void SaveToFile(std::string const&);
 
 protected:
+    void LoadFromFile(std::string const&);
+
     int LoadMesh(std::string const&);
     void BuildAABBTree();
     void Sampling(double const);

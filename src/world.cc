@@ -59,3 +59,11 @@ void World::draw() const
         fluid.second->draw(worldToCamera, cameraToView);
     }
 }
+
+void World::update(float const dt)
+{
+    for (auto const& fluid : fluids)
+    {
+        fluid.second->update(dt);
+    }
+}

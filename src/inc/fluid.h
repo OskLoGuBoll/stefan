@@ -12,7 +12,8 @@ public:
     Fluid(PointCloud&&, GLuint);
 
     void draw(mat4 const&, mat4 const&);
-    GLuint getShader();
+    void update(float const);
+    GLuint getShader() const;
 
 private:
     void initArrays();

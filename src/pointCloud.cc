@@ -1,5 +1,8 @@
 #include "pointCloud.h"
 
+#include <filesystem>
+namespace fs = std::filesystem;
+
 PointCloud::PointCloud()
 : pointCloud{}, radii{}, colors{}, centerPosition{}, mesh{}, tree{}, insideTester{nullptr}
 {}
@@ -7,30 +10,27 @@ PointCloud::PointCloud()
 PointCloud::PointCloud(std::string const& filePath, double const resolution)
 : pointCloud{}, radii{}, colors{}, centerPosition{}, mesh{}, tree{}, insideTester{nullptr}
 {
-    LoadMesh(filePath);
-    BuildAABBTree();
-    Sampling(resolution);
-    SaveToFile(filePath);
+    fs::directory_entry file {filePath};
+    fs::directory_entry xyzFile {"assets/pointClouds/" + file.path().stem().string() + ".xyz"};
+
+    if (fs::is_regular_file(xyzFile))
+    {
+        LoadFromFile(xyzFile.path().string());
+    }
+    else
+    {
+        LoadMesh(filePath);
+        BuildAABBTree();
+        Sampling(resolution);
+
+        SaveToFile(xyzFile.path().string());
+    }
 }
 
 PointCloud::PointCloud(std::string const& filePath)
 : pointCloud{}, radii{}, colors{}, centerPosition{}, mesh{}, tree{}, insideTester{nullptr}
 {
-    std::ifstream ifs {filePath};
-    std::string line {};
-
-    while (std::getline(ifs, line))
-    {
-        std::istringstream iss {line};
-
-        vec3 vertex {};
-
-        iss >> vertex.x >> vertex.y >> vertex.z;
-
-        pointCloud.push_back(vertex);
-        colors.push_back(vec4{0,0.3,1,1});
-        radii.push_back(100);
-    }
+    LoadFromFile(filePath);
 }
 
 PointCloud::~PointCloud()
@@ -124,7 +124,7 @@ void PointCloud::Sampling(double const resolution)
                 if ((*insideTester)(p) == CGAL::ON_BOUNDED_SIDE) {
                     pointCloud.push_back(vec3{p.x(), p.y(), p.z()});
                     colors.push_back(vec4{0,0.3,1,1});
-                    radii.push_back(100);
+                    radii.push_back(resolution);
                 }
             }
         }
@@ -133,9 +133,28 @@ void PointCloud::Sampling(double const resolution)
 
 void PointCloud::SaveToFile(std::string const& filePath)
 {
-    std::ofstream out {filePath + ".xyz"};
+    std::ofstream out {filePath};
     for (auto const& p : pointCloud) 
     {
         out << p.x << " " << p.y << " " << p.z << "\n";
+    }
+}
+
+void PointCloud::LoadFromFile(std::string const& filePath)
+{
+    std::ifstream ifs {filePath};
+    std::string line {};
+
+    while (std::getline(ifs, line))
+    {
+        std::istringstream iss {line};
+
+        vec3 vertex {};
+
+        iss >> vertex.x >> vertex.y >> vertex.z;
+
+        pointCloud.push_back(vertex);
+        colors.push_back(vec4{vertex});
+        radii.push_back(100);
     }
 }

@@ -28,6 +28,16 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView)
     glBindVertexArray(0);
 }
 
+void Fluid::update(float const dt)
+{
+
+}
+
+GLuint Fluid::getShader() const
+{
+    return shader;
+}
+
 void Fluid::initArrays()
 {
     glGenVertexArrays(1, &vao);

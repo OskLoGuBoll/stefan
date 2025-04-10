@@ -84,7 +84,10 @@ void Demo::logic()
 	elapsedTime = static_cast<GLuint>(glutGet(GLUT_ELAPSED_TIME));
 
     world.getCamera().handleInput(mouseMovedVec, keyDown.data());
-    //world.update(dt);
+    // This is just a test
+    world.getObject("ball1")->setPosition(0.05*dt);
+    world.getObject("ball2")->setPosition(0.01*dt);
+    world.update(dt);
     mouseMovedVec = vec2{0,0};
 }
 
@@ -100,9 +103,6 @@ void Demo::display(void)
 
     world.draw();
 
-    // This is just a test
-    world.getObject("ball1")->setPosition(0.05);
-    world.getObject("ball2")->setPosition(0.01);
     //std::cout<<world.getObject("ball1")->getModelToWorld().m[3]<<std::endl;
 
 	//printf("%d %d \n", nr1, nr2);

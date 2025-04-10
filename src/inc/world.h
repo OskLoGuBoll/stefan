@@ -24,7 +24,7 @@ public:
     void addObject(std::string const&, std::unique_ptr<ExtModel>);
     void addPointCloud(std::string const&, std::unique_ptr<Fluid>);
     void draw() const;
-    void init(AssetManager const&);
+    void update(float const);
 
     ExtModel* getObject(const std::string& key);
 
