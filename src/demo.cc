@@ -37,9 +37,8 @@ Demo::Demo(float width, float height)
     // Just for test
     world.addObject("ball1",std::make_unique<ExtModel>(assets));
 
-    PointCloud<10000> pc{"assets/models/groundsphere.obj"};
-    pc.SaveToFile("assets/pc.xyz");
-
+    world.addObject("ball2", std::make_unique<ExtModel>(assets));
+    world.addPointCloud("fluid1", std::make_unique<Fluid>(PointCloud{"assets/models/groundsphere.obj", 50}, assets.getShader("balls")));
 }
 
 void Demo::run()
@@ -85,6 +84,7 @@ void Demo::logic()
 	elapsedTime = static_cast<GLuint>(glutGet(GLUT_ELAPSED_TIME));
 
     world.getCamera().handleInput(mouseMovedVec, keyDown.data());
+    //world.update(dt);
     mouseMovedVec = vec2{0,0};
 }
 

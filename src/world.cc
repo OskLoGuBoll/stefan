@@ -5,10 +5,9 @@
 #include "lights.h"
 
 World::World(AssetManager const& assets)
-: terrain{assets.getModel("Ground"), assets.getShader("lab4-2")}, skybox{assets}, objects{}, camera{}, program{}, nolight{}
+: terrain{assets.getModel("Ground"), assets.getShader("lab4-2")}, skybox{assets}, objects{}, fluids{}, camera{}, program{}, nolight{}
 {
     // Just for test
-    addObject("ball2", std::make_unique<ExtModel>(assets));
 }
 
 Camera& World::getCamera()
@@ -21,11 +20,17 @@ std::unordered_map<std::string,std::unique_ptr<ExtModel>> const& World::getObjec
     return objects;
 }
 
-void World::addObject(const std::string& objectName, std::unique_ptr<ExtModel> object) {
-    objects[objectName] = std::move(object);; // overwrites if key exists
+void World::addObject(std::string const& objectName, std::unique_ptr<ExtModel> object)
+{
+    objects[objectName] = std::move(object); // overwrites if key exists
 }
 
-ExtModel* World::getObject(const std::string& objectName) {
+void World::addPointCloud(std::string const& objectName, std::unique_ptr<Fluid> object)
+{
+    fluids[objectName] = std::move(object);
+}
+
+ExtModel* World::getObject(std::string const& objectName) {
     auto object = objects.find(objectName);
     return (object != objects.end()) ? object->second.get() : nullptr;
 }
@@ -38,9 +43,9 @@ void World::draw() const
     skybox.draw(worldToCamera, cameraToView);
     terrain.draw(worldToCamera, cameraToView);
 
-    for (const auto& object : objects)
+    for (auto const& object : objects)
     {
-        GLuint program = object.second->getShader();
+        GLuint program {object.second->getShader()};
 
         glUseProgram(program);
         glUniform3fv(glGetUniformLocation(program, "lightSourcesDirPosArr"), 4, &lightSourcesDirectionsPositions[0].x);
@@ -48,5 +53,9 @@ void World::draw() const
         glUniform1iv(glGetUniformLocation(program, "isDirectional"), 4, isDirectional);
 
         object.second->draw(worldToCamera, cameraToView);
+    }
+    for (auto const& fluid : fluids)
+    {
+        fluid.second->draw(worldToCamera, cameraToView);
     }
 }
