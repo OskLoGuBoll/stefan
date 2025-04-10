@@ -1,18 +1,28 @@
-SRCS := $(wildcard *.cc)
-CXXFlAGS := std=c++17 -Wall -Wextra -pedantic -Weffc++ -Wold-style-cast -fmax-errors=3 -g
+SRCS := $(wildcard src/*.cc)
+CXXFLAGS := -std=c++17 -Wall -Wextra -pedantic -Weffc++ -Wold-style-cast -fmax-errors=3 -g
 COMMON_DIR = ./common
 BUILD_DIR := ./build
 EXEC := stefan
 
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
-INCL := -I$(COMMON_DIR)/ -I($COMMON_DIR)/Linux -DGL_GLEXT_PROTOTYPES -lX11 -lGL -lm
+
+COMMON := $(wildcard $(COMMON_DIR)/*.c $(COMMON_DIR)/Linux/*.c)
+COMMON_OBJ := $(COMMON:%=$(BUILD_DIR)/%.o)
+
+INCL := -Isrc/inc/ -I$(COMMON_DIR)/ -I$(COMMON_DIR)/Linux
+LDFLAGS := -DGL_GLEXT_PROTOTYPES -lX11 -lGL -lm
+
+
+$(BUILD_DIR)/%.c.o: %.c
+	mkdir -p $(dir $@)
+	gcc -Wall $(INCL) -c $< -o $@ $(LDFLAGS)
 
 $(BUILD_DIR)/%.cc.o: %.cc
 	mkdir -p $(dir $@)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(INCL) -c $< -o $@ $(LDFLAGS)
 
-$(EXEC): $(OBJS)
-	$(CXX) $(CXXFLAGS) $(INCL) $^ -o $@
+$(EXEC): $(OBJS) $(COMMON_OBJ)
+	$(CXX) $(CXXFLAGS) $(INCL) $^ -o $@ $(LDFLAGS)
 
 .PHONY: clean
 clean:
