@@ -6,6 +6,7 @@ in vec4 in_color;
 
 out vec4 color;
 out float radius;
+out float z_depth;
 
 uniform mat4 modelToWorld;
 uniform mat4 worldToCamera;
@@ -13,7 +14,6 @@ uniform mat4 cameraToView;
 
 void main(void)
 {
-    // Calculate point size based on distance from camera to maintain consistent size
     vec4 worldPos = modelToWorld * vec4(in_position, 1.0);
     vec4 cameraPos = worldToCamera * worldPos;
     gl_Position = cameraToView * cameraPos;
@@ -24,4 +24,5 @@ void main(void)
     
     color = in_color;
     radius = in_radius;
+    z_depth = gl_Position.z;
 }

@@ -23,11 +23,11 @@ void AssetManager::loadAssets(std::string const& assetPath)
     std::cout << "<<< Read files: " << std::endl;
     for (auto const& file : fs::directory_iterator(assetPath))
     {
-        std::string filename {file.path().string()};
+        std::string filePath {file.path().string()};
 
-        if (filename == assetPath + "textures")
+        if (filePath == assetPath + "textures")
         {
-            for (auto const& texture : fs::directory_iterator(filename))
+            for (auto const& texture : fs::directory_iterator(filePath))
             {
                 std::string key {texture.path().stem().string()};
                 if (fs::is_regular_file(texture) && key.find("hm") != std::string::npos)
@@ -65,21 +65,25 @@ void AssetManager::loadAssets(std::string const& assetPath)
                 }
             }
         } 
-        else if (filename == assetPath + "shaders")
+        else if (filePath == assetPath + "shaders")
         {
-            for (auto const& shader : fs::directory_iterator(filename))
+            for (auto const& shader : fs::directory_iterator(filePath))
             {
                 std::string key {shader.path().stem().string()};
+                std::string filename {shader.path().string()};
 
-                if (fs::is_regular_file(shader) && shaders[key] == 0) {
-                    shaders[key] = loadShaders((assetPath + "shaders/" + key + ".vert").c_str(),
-                                               (assetPath + "shaders/" + key + ".frag").c_str());
+                if (fs::is_regular_file(shader) && filename.find(".comp") != std::string::npos && shaders[key] == 0) {
+                    shaders[key] = loadComputeShader(filename.c_str());
+                }
+                else if (fs::is_regular_file(shader) && shaders[key] == 0) {
+                    shaders[key] = loadShaders((filePath + "/" + key + ".vert").c_str(),
+                                               (filePath + "/" + key + ".frag").c_str());
                 }
             }
         }
-        else if (filename == assetPath + "models")
+        else if (filePath == assetPath + "models")
         {
-            for (auto const& model : fs::directory_iterator(filename))
+            for (auto const& model : fs::directory_iterator(filePath))
             {
                 std::string key {model.path().stem().string()};
                 std::string modelPath {model.path().string()};
@@ -90,9 +94,9 @@ void AssetManager::loadAssets(std::string const& assetPath)
                 }
             }
         }
-        else if (filename == assetPath + "pointClouds")
+        else if (filePath == assetPath + "pointClouds")
         {
-            for (auto const& cloud : fs::directory_iterator(filename))
+            for (auto const& cloud : fs::directory_iterator(filePath))
             {
                 std::string key {cloud.path().stem().string()};
                 std::string cloudPath {cloud.path().string()};

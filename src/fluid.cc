@@ -2,16 +2,16 @@
 
 #include <random>
 
-Fluid::Fluid(PointCloud& cloud, GLuint shader)
-: PointCloud{cloud}, shader{shader}, vao{}, vb{}, rb{}, cb{}
+Fluid::Fluid(PointCloud& cloud, GLuint shader, GLuint computeShader)
+: PointCloud{cloud}, shader{shader}, computeShader{computeShader}, vao{}, vb{}, rb{}, cb{}
 {
-    initArrays();
+    initBuffers();
 }
 
-Fluid::Fluid(PointCloud&& cloud, GLuint shader)
-: PointCloud{cloud}, shader{shader}, vao{}, vb{}, rb{}, cb{}
+Fluid::Fluid(PointCloud&& cloud, GLuint shader, GLuint computeShader)
+: PointCloud{cloud}, shader{shader}, computeShader{computeShader}, vao{}, vb{}, rb{}, cb{}
 {
-    initArrays();
+    initBuffers();
 }
 
 void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView)
@@ -32,21 +32,11 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView)
 
 void Fluid::update(float const dt)
 {
-    std::random_device rd {};
-    std::mt19937 gen{rd()};
-    std::uniform_real_distribution<float> distrib {-1.f, 1.f};
+    glUseProgram(computeShader);
 
-    for (auto& particle : pointCloud)
-    {
-        particle += vec3{distrib(gen)*dt, distrib(gen)*dt, distrib(gen)*dt};
-    }
+    glDispatchCompute(pointCloud.size(), 1, 1);
 
-    glBindBuffer(GL_ARRAY_BUFFER, vb);
-    glBufferSubData(GL_ARRAY_BUFFER, 
-                   0, 
-                   pointCloud.size() * sizeof(vec3),
-                   pointCloud.data());
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 }
 
 GLuint Fluid::getShader() const
@@ -54,23 +44,25 @@ GLuint Fluid::getShader() const
     return shader;
 }
 
-void Fluid::initArrays()
+void Fluid::initBuffers()
 {
-    glGenVertexArrays(1, &vao);
-    glGenBuffers(1, &vb);
-    glGenBuffers(1, &rb);
-    glGenBuffers(1, &cb);
-    
     glEnable(GL_PROGRAM_POINT_SIZE);
     glEnable(GL_POINT_SPRITE);
+
+    glGenVertexArrays(1, &vao);
+    glGenBuffers(1, &rb);
+    glGenBuffers(1, &cb);
+    glCreateBuffers(1, &vb);
+
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, vb);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, 
+         pointCloud.size() * sizeof(vec3),
+         pointCloud.data(), 
+         GL_DYNAMIC_DRAW);
 
     glBindVertexArray(vao);
 
     glBindBuffer(GL_ARRAY_BUFFER, vb);
-    glBufferData(GL_ARRAY_BUFFER, 
-         pointCloud.size() * sizeof(vec3),
-         pointCloud.data(), 
-         GL_DYNAMIC_DRAW);
 
     GLint loc {};
 
