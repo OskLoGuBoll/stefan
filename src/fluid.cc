@@ -1,5 +1,7 @@
 #include "fluid.h"
 
+#include <random>
+
 Fluid::Fluid(PointCloud& cloud, GLuint shader)
 : PointCloud{cloud}, shader{shader}, vao{}, vb{}, rb{}, cb{}
 {
@@ -30,7 +32,21 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView)
 
 void Fluid::update(float const dt)
 {
+    std::random_device rd {};
+    std::mt19937 gen{rd()};
+    std::uniform_real_distribution<float> distrib {-1.f, 1.f};
 
+    for (auto& particle : pointCloud)
+    {
+        particle += vec3{distrib(gen)*dt, distrib(gen)*dt, distrib(gen)*dt};
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, vb);
+    glBufferSubData(GL_ARRAY_BUFFER, 
+                   0, 
+                   pointCloud.size() * sizeof(vec3),
+                   pointCloud.data());
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 GLuint Fluid::getShader() const
@@ -54,7 +70,7 @@ void Fluid::initArrays()
     glBufferData(GL_ARRAY_BUFFER, 
          pointCloud.size() * sizeof(vec3),
          pointCloud.data(), 
-         GL_STATIC_DRAW);
+         GL_DYNAMIC_DRAW);
 
     GLint loc {};
 

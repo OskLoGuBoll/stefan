@@ -41,17 +41,17 @@ void World::draw() const
     mat4 cameraToView {camera.getProjectionMat()};
 
     skybox.draw(worldToCamera, cameraToView);
+
+    GLuint program {terrain.getShader()};
+    glUseProgram(program);
+    glUniform3fv(glGetUniformLocation(program, "lightSourcesDirPosArr"), 4, &lightSourcesDirectionsPositions[0].x);
+    glUniform3fv(glGetUniformLocation(program, "lightSourcesColorArr"), 4, &lightSourcesColorsArr[0].x);
+    glUniform1iv(glGetUniformLocation(program, "isDirectional"), 4, isDirectional);
+
     terrain.draw(worldToCamera, cameraToView);
 
     for (auto const& object : objects)
     {
-        GLuint program {object.second->getShader()};
-
-        glUseProgram(program);
-        glUniform3fv(glGetUniformLocation(program, "lightSourcesDirPosArr"), 4, &lightSourcesDirectionsPositions[0].x);
-        glUniform3fv(glGetUniformLocation(program, "lightSourcesColorArr"), 4, &lightSourcesColorsArr[0].x);
-        glUniform1iv(glGetUniformLocation(program, "isDirectional"), 4, isDirectional);
-
         object.second->draw(worldToCamera, cameraToView);
     }
     for (auto const& fluid : fluids)

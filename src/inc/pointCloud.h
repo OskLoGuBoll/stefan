@@ -40,13 +40,14 @@ public:
 
     void SaveToFile(std::string const&);
 
-protected:
+private:
     void LoadFromFile(std::string const&);
 
     int LoadMesh(std::string const&);
     void BuildAABBTree();
     void Sampling(double const);
 
+protected:
     std::vector<vec3> pointCloud;
     std::vector<float> radii;
     std::vector<vec4> colors;

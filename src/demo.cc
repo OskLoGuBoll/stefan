@@ -34,10 +34,6 @@ Demo::Demo(float width, float height)
 
 	glEnable(GL_DEBUG_OUTPUT);
 
-    // Just for test
-    world.addObject("ball1",std::make_unique<ExtModel>(assets));
-
-    world.addObject("ball2", std::make_unique<ExtModel>(assets));
     world.addPointCloud("fluid1", std::make_unique<Fluid>(PointCloud{"assets/models/groundsphere.obj", 50}, assets.getShader("balls")));
 }
 
@@ -85,8 +81,6 @@ void Demo::logic()
 
     world.getCamera().handleInput(mouseMovedVec, keyDown.data());
     // This is just a test
-    world.getObject("ball1")->setPosition(0.05*dt);
-    world.getObject("ball2")->setPosition(0.01*dt);
     world.update(dt);
     mouseMovedVec = vec2{0,0};
 }
