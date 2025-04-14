@@ -4,6 +4,7 @@
 #include "LoadTGA.h"
 #include "LittleOBJLoader.h"
 #include "GL_utilities.h"
+#include "pointCloud.h"
 
 #include <map>
 #include <string>
@@ -16,6 +17,7 @@ public:
     GLuint getTexture(std::string const&) const;
     GLuint getShader(std::string const&) const;
     Model* getModel(std::string const&) const;
+    PointCloud& getPointCloud(std::string const&);
 
     void loadAssets(std::string const&);
 
@@ -23,6 +25,7 @@ private:
     std::map<std::string, GLuint> textures;
     std::map<std::string, GLuint> shaders;
     std::map<std::string, Model*> models;
+    std::map<std::string, PointCloud> pointClouds;
 };
 
 struct Drawable

@@ -4,6 +4,7 @@
 #include "extModel.h"
 #include "skybox.h"
 #include "camera.h"
+#include "fluid.h"
 #include "assetManager.h"
 #include <unordered_map>
 #include <memory>
@@ -20,9 +21,10 @@ public:
 
     Camera& getCamera();
     std::unordered_map<std::string,std::unique_ptr<ExtModel>> const& getObjects() const;
-    void addObject(const std::string&, std::unique_ptr<ExtModel>);
+    void addObject(std::string const&, std::unique_ptr<ExtModel>);
+    void addPointCloud(std::string const&, std::unique_ptr<Fluid>);
     void draw() const;
-    void init(AssetManager const&);
+    void update(float const);
 
     ExtModel* getObject(const std::string& key);
 
@@ -30,6 +32,7 @@ private:
     ExtModel terrain;
     Skybox skybox;
     std::unordered_map<std::string,std::unique_ptr<ExtModel>> objects;
+    std::unordered_map<std::string,std::unique_ptr<Fluid>> fluids;
     Camera camera;
     GLuint program, nolight;
 };

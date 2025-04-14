@@ -10,15 +10,12 @@
 
 #include <vector>
 #include <fstream>
-#include <random>
 #include <string>
 #include <iostream>
 
 #include "VectorUtils4.h"
-#include "assetManager.h"
+#include "TriangulateOBJ.h"
 
-
-template <size_t N>
 class PointCloud
 {
 public:
@@ -31,29 +28,35 @@ public:
     typedef CGAL::Side_of_triangle_mesh<Mesh, Kernel>       PointInside;
     typedef CGAL::Bbox_3                                    BoundingBox;
 
-    PointCloud(std::string filePath);
+    PointCloud();
+    PointCloud(std::string const&, double const);
+    PointCloud(std::string const&);
 
-    ~PointCloud() = default;
-    PointCloud(const PointCloud& other) = default;
-    PointCloud& operator=(const PointCloud& other) = default;
-    PointCloud(PointCloud&& other) = default;
-    PointCloud& operator=(PointCloud&& other) = default;
-    void SaveToFile(std::string);
+    ~PointCloud();
+    PointCloud(PointCloud const&);
+    PointCloud& operator=(PointCloud const&);
+    PointCloud(PointCloud&&);
+    PointCloud& operator=(PointCloud&&);
 
-private:
-    int LoadMesh(std::string);
+    void SaveToFile(std::string const&);
+
+protected:
+    void LoadFromFile(std::string const&);
+
+    int LoadMesh(std::string const&);
     void BuildAABBTree();
-    void RandomSampling();
+    void Sampling(double const);
 
-    std::array<Point, N> pointCloud;
+    std::vector<vec3> pointCloud;
     std::vector<float> radii;
     std::vector<vec4> colors;
 
+    vec3 centerPosition;
+
     Mesh mesh;
     Tree tree;
-    PointInside* insideTester = nullptr;
+    PointInside* insideTester;
 
 };
 
-#include "pointCloud.tcc"
 #endif

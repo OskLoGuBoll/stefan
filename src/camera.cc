@@ -7,7 +7,7 @@
 Camera::Camera(vec3 const& position)
 : pitchMatrix{IdentityMatrix()}, yawMatrix{IdentityMatrix()}, position{position},
     pitch{}, yaw{}, near{1.f}, far{500.f}, aspect{16.f/9.f}, fov{60},
-    movementSpeed{1}, sensitivity{0.001}
+    movementSpeed{0.1}, sensitivity{0.001}
 {}
 
 void Camera::handleInput(vec2 const& mouseMovedVec, bool const* keyDown)
@@ -54,7 +54,7 @@ void Camera::updatePosition(bool const* keyDown)
         movement += vec3{0,movementSpeed,0};
     }
 
-    movement = normalize(movement);
+    movement = normalize(movement) * movementSpeed;
             
     position += transpose(yawMatrix) * vec4{movement.x, movement.y, movement.z, 0};
 }

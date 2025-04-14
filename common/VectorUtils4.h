@@ -122,13 +122,7 @@
 
 // GLSL-style
 // These are already changed, here I define the intermediate type names that I use in some demos.
-#define Point3D vec3
-#define Matrix3D mat3
-#define Matrix4D mat4
-#define DotProduct dot
-#define CrossProduct cross
-#define Normalize normalize
-#define Transpose transpose
+
 // Furthermore, SplitVector should be revised to conform with reflect()
 
 // Note 210515: I have removed the constructors from my structs below in order to please
@@ -770,7 +764,7 @@ char transposed = 0;
 		GLfloat nlen;
 		GLfloat nlen2;
 
-		nlen = DotProduct(v, n);
+		nlen = dot(v, n);
 		nlen2 = n.x*n.x+n.y*n.y+n.z*n.z; // Squared length
 		if (nlen2 == 0)
 		{
@@ -1027,10 +1021,10 @@ char transposed = 0;
 //		SetVector(R[8], R[9], R[10], &z);
 			// Kryssa fram ur varandra
 			// Normera
-			z = CrossProduct(x, y);
-			z = Normalize(z);
-			x = Normalize(x);
-			y = CrossProduct(z, x);
+			z = cross(x, y);
+			z = normalize(z);
+			x = normalize(x);
+			y = cross(z, x);
 			R->m[0] = x.x;
 			R->m[1] = x.y;
 			R->m[2] = x.z;
@@ -1057,10 +1051,10 @@ char transposed = 0;
 //		SetVector(R[2], R[6], R[10], &z);
 			// Kryssa fram ur varandra
 			// Normera
-			z = CrossProduct(x, y);
-			z = Normalize(z);
-			x = Normalize(x);
-			y = CrossProduct(z, x);
+			z = cross(x, y);
+			z = normalize(z);
+			x = normalize(x);
+			y = cross(z, x);
 			R->m[0] = x.x;
 			R->m[4] = x.y;
 			R->m[8] = x.z;
@@ -1145,10 +1139,10 @@ mat4 ArbRotate(vec3 axis, GLfloat fi)
 		}
 	}
 
-	x = Normalize(axis);
+	x = normalize(axis);
 	z = SetVector(0,0,1); // Temp z
-	y = Normalize(CrossProduct(z, x)); // y' = z^ x x'
-	z = CrossProduct(x, y); // z' = x x y
+	y = normalize(cross(z, x)); // y' = z^ x x'
+	z = cross(x, y); // z' = x x y
 
 	if (transposed)
 	{
@@ -1167,7 +1161,7 @@ mat4 ArbRotate(vec3 axis, GLfloat fi)
 		R.m[12] = 0.0; R.m[13] = 0.0; R.m[14] = 0.0;  R.m[15] = 1.0;
 	}
 
-	Rt = Transpose(R); // Transpose = Invert -> felet ej i Transpose, och det Šr en ortonormal matris
+	Rt = transpose(R); // Transpose = Invert -> felet ej i Transpose, och det Šr en ortonormal matris
 
 	Raxel = Rx(fi); // Rotate around x axis
 
@@ -1231,9 +1225,9 @@ mat4 lookAtv(vec3 p, vec3 l, vec3 v)
 	vec3 n, u;
 	mat4 rot, trans;
 
-	n = Normalize(VectorSub(p, l));
-	u = Normalize(CrossProduct(v, n));
-	v = CrossProduct(n, u);
+	n = normalize(VectorSub(p, l));
+	u = normalize(cross(v, n));
+	v = cross(n, u);
 
 	if (transposed)
 	rot = SetMat4(u.x, v.x, n.x, 0,
@@ -1312,7 +1306,7 @@ mat4 frustum(float left, float right, float bottom, float top,
     matrix.m[15] = 0.0;
     
     if (!transposed)
-    	matrix = Transpose(matrix);
+    	matrix = transpose(matrix);
     
     return matrix;
 }
@@ -1335,7 +1329,7 @@ mat4 ortho(GLfloat left, GLfloat right, GLfloat bottom, GLfloat top, GLfloat nea
             0, 0, 0, 1);
 
         if (transposed)
-   			o = Transpose(o);
+   			o = transpose(o);
 
         return o;
 }

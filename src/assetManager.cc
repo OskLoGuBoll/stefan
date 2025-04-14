@@ -13,7 +13,7 @@
 namespace fs = std::filesystem;
 
 AssetManager::AssetManager(std::string const& path)
-: textures{}, shaders{}, models{}
+: textures{}, shaders{}, models{}, pointClouds{}
 {
     loadAssets(path);
 }
@@ -84,13 +84,23 @@ void AssetManager::loadAssets(std::string const& assetPath)
                 std::string key {model.path().stem().string()};
                 std::string modelPath {model.path().string()};
                 
-                if (fs::is_regular_file(model) && key.find("copy") != std::string::npos)
-                {
-
-                }
-                else if (fs::is_regular_file(model))
+                if (fs::is_regular_file(model))
                 {
                     models[key] = LoadModel(modelPath.c_str());
+                }
+            }
+        }
+        else if (filename == assetPath + "pointClouds")
+        {
+            for (auto const& cloud : fs::directory_iterator(filename))
+            {
+                std::string key {cloud.path().stem().string()};
+                std::string cloudPath {cloud.path().string()};
+                
+                if (fs::is_regular_file(cloud))
+                {
+                    std::cout << cloudPath << std::endl;
+                    pointClouds[key] = PointCloud{cloudPath};
                 }
             }
         }
@@ -112,4 +122,9 @@ GLuint AssetManager::getShader(std::string const& key) const
 Model* AssetManager::getModel(std::string const& key) const
 {
     return models.at(key);
+}
+
+PointCloud& AssetManager::getPointCloud(std::string const& key)
+{
+    return pointClouds.at(key);
 }
