@@ -212,7 +212,7 @@ namespace obj
 				if( !parse(line + 2, indices, _, temp) )
 					indices.clear();
 
-				if( indices.size() > 3 )
+				if( indices.size() >= 3 )
 					polygon = true;
 			}
 

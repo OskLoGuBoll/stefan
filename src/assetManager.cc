@@ -90,6 +90,7 @@ void AssetManager::loadAssets(std::string const& assetPath)
                 
                 if (fs::is_regular_file(model))
                 {
+                    std::cout << modelPath << std::endl;
                     models[key] = LoadModel(modelPath.c_str());
                 }
             }

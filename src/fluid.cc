@@ -3,13 +3,13 @@
 #include <random>
 
 Fluid::Fluid(PointCloud& cloud, GLuint shader, GLuint computeShader)
-: PointCloud{cloud}, shader{shader}, computeShader{computeShader}, vao{}, vb{}, rb{}, cb{}
+: PointCloud{cloud}, shader{shader}, computeShader{computeShader}, vao{}, posBuffer{}, velBuffer{}, rb{}, cb{}
 {
     initBuffers();
 }
 
 Fluid::Fluid(PointCloud&& cloud, GLuint shader, GLuint computeShader)
-: PointCloud{cloud}, shader{shader}, computeShader{computeShader}, vao{}, vb{}, rb{}, cb{}
+: PointCloud{cloud}, shader{shader}, computeShader{computeShader}, vao{}, posBuffer{}, velBuffer{}, rb{}, cb{}
 {
     initBuffers();
 }
@@ -34,7 +34,9 @@ void Fluid::update(float const dt)
 {
     glUseProgram(computeShader);
 
-    glDispatchCompute(pointCloud.size(), 1, 1);
+    glUniform1f(glGetUniformLocation(computeShader, "dt"), dt);
+
+    glDispatchCompute((pointCloud.size() + 63) / 64, 1, 1);
 
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 }
@@ -52,24 +54,32 @@ void Fluid::initBuffers()
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &rb);
     glGenBuffers(1, &cb);
-    glCreateBuffers(1, &vb);
+    glCreateBuffers(1, &posBuffer);
+    glCreateBuffers(1, &velBuffer);
 
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, vb);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, posBuffer);
     glBufferData(GL_SHADER_STORAGE_BUFFER, 
-         pointCloud.size() * sizeof(vec3),
+         pointCloud.size() * sizeof(vec4),
          pointCloud.data(), 
          GL_DYNAMIC_DRAW);
 
+    std::vector<vec4> velocities(pointCloud.size(), vec4(0.0f));
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, velBuffer);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, 
+        velocities.size() * sizeof(vec4),
+        velocities.data(), 
+        GL_DYNAMIC_DRAW);
+
     glBindVertexArray(vao);
 
-    glBindBuffer(GL_ARRAY_BUFFER, vb);
+    glBindBuffer(GL_ARRAY_BUFFER, posBuffer);
 
     GLint loc {};
 
 	loc = glGetAttribLocation(shader, "in_position");
     if (loc >= 0)
     {
-        glVertexAttribPointer(loc, 3, GL_FLOAT, GL_FALSE, 0, 0); 
+        glVertexAttribPointer(loc, 4, GL_FLOAT, GL_FALSE, 0, 0); 
         glEnableVertexAttribArray(loc);
     }
 

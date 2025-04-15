@@ -21,7 +21,8 @@ private:
     GLuint shader;
     GLuint computeShader;
     GLuint vao;
-    GLuint vb;
+    GLuint posBuffer;
+    GLuint velBuffer;
     GLuint rb;
     GLuint cb;
 };

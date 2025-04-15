@@ -34,7 +34,7 @@ Demo::Demo(float width, float height)
 
 	glEnable(GL_DEBUG_OUTPUT);
 
-    world.addPointCloud("fluid1", std::make_unique<Fluid>(PointCloud{"assets/models/groundsphere.obj", 60}, assets.getShader("balls"), assets.getShader("fluid")));
+    world.addPointCloud("fluid1", std::make_unique<Fluid>(PointCloud{"assets/models/teapot.obj", 60}, assets.getShader("balls"), assets.getShader("fluid")));
 }
 
 void Demo::run()
