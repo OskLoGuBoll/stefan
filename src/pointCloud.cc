@@ -4,11 +4,11 @@
 namespace fs = std::filesystem;
 
 PointCloud::PointCloud()
-: pointCloud{}, radii{}, colors{}, centerPosition{0,1,0}, mesh{}, tree{}, insideTester{nullptr}
+: pointCloud{}, centerPosition{0,1,0}, mesh{}, tree{}, insideTester{nullptr}
 {}
 
 PointCloud::PointCloud(std::string const& filePath, double const resolution)
-: pointCloud{}, radii{}, colors{}, centerPosition{0,1,0}, mesh{}, tree{}, insideTester{nullptr}
+: pointCloud{}, centerPosition{0,1,0}, mesh{}, tree{}, insideTester{nullptr}
 {
     fs::directory_entry file {filePath};
     fs::directory_entry xyzFile {"assets/pointClouds/" + file.path().stem().string() + ".xyz"};
@@ -28,7 +28,7 @@ PointCloud::PointCloud(std::string const& filePath, double const resolution)
 }
 
 PointCloud::PointCloud(std::string const& filePath)
-: pointCloud{}, radii{}, colors{}, centerPosition{}, mesh{}, tree{}, insideTester{nullptr}
+: pointCloud{}, centerPosition{}, mesh{}, tree{}, insideTester{nullptr}
 {
     LoadFromFile(filePath);
 }
@@ -39,30 +39,26 @@ PointCloud::~PointCloud()
 }
 
 PointCloud::PointCloud(PointCloud const& other)
-: pointCloud{other.pointCloud}, radii{other.radii}, colors{other.colors},
-    centerPosition{other.centerPosition}, mesh{}, tree{}, insideTester{nullptr}
+: pointCloud{other.pointCloud}, centerPosition{other.centerPosition},
+    mesh{}, tree{}, insideTester{nullptr}
 {}
 
 PointCloud& PointCloud::operator=(PointCloud const& other)
 {
     pointCloud = other.pointCloud;
-    radii = other.radii;
-    colors = other.colors;
     centerPosition = other.centerPosition;
 
     return *this;
 }
 
 PointCloud::PointCloud(PointCloud&& other)
-: pointCloud{other.pointCloud}, radii{other.radii}, colors{other.colors},
-    centerPosition{other.centerPosition}, mesh{}, tree{}, insideTester{nullptr}
+: pointCloud{other.pointCloud}, centerPosition{other.centerPosition},
+    mesh{}, tree{}, insideTester{nullptr}
 {}
 
 PointCloud& PointCloud::operator=(PointCloud&& other)
 {
     pointCloud = other.pointCloud;
-    radii = other.radii;
-    colors = other.colors;
     centerPosition = other.centerPosition;
 
     return *this;
@@ -123,8 +119,6 @@ void PointCloud::Sampling(double const resolution)
                 Point p(x, y, z);
                 if ((*insideTester)(p) == CGAL::ON_BOUNDED_SIDE) {
                     pointCloud.push_back(vec4{p.x(), p.y(), p.z(), 0});
-                    colors.push_back(vec4{0,0.3,1,1});
-                    radii.push_back(resolution*0.5f);
                 }
             }
         }
@@ -136,7 +130,7 @@ void PointCloud::SaveToFile(std::string const& filePath)
     std::ofstream out {filePath};
     for (unsigned int i {}; i < pointCloud.size(); i++) 
     {
-        out << pointCloud[i].x << " " << pointCloud[i].y << " " << pointCloud[i].z << " " << radii[i] << "\n";
+        out << pointCloud[i].x << " " << pointCloud[i].y << " " << pointCloud[i].z << "\n";
     }
 }
 
@@ -150,11 +144,8 @@ void PointCloud::LoadFromFile(std::string const& filePath)
         std::istringstream iss {line};
 
         vec4 vertex {};
-        float radius {};
 
-        iss >> vertex.x >> vertex.y >> vertex.z >> radius;
+        iss >> vertex.x >> vertex.y >> vertex.z;
         pointCloud.push_back(vertex);
-        radii.push_back(radius);
-        colors.push_back(vertex);
     }
 }

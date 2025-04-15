@@ -3,13 +3,15 @@
 #include <random>
 
 Fluid::Fluid(PointCloud& cloud, GLuint shader, GLuint computeShader)
-: PointCloud{cloud}, shader{shader}, computeShader{computeShader}, vao{}, posBuffer{}, velBuffer{}, rb{}, cb{}
+: PointCloud{cloud}, shader{shader}, computeShader{computeShader},
+    vao{}, posBuffer{}, velBuffer{}
 {
     initBuffers();
 }
 
 Fluid::Fluid(PointCloud&& cloud, GLuint shader, GLuint computeShader)
-: PointCloud{cloud}, shader{shader}, computeShader{computeShader}, vao{}, posBuffer{}, velBuffer{}, rb{}, cb{}
+: PointCloud{cloud}, shader{shader}, computeShader{computeShader},
+    vao{}, posBuffer{}, velBuffer{}
 {
     initBuffers();
 }
@@ -52,8 +54,6 @@ void Fluid::initBuffers()
     glEnable(GL_POINT_SPRITE);
 
     glGenVertexArrays(1, &vao);
-    glGenBuffers(1, &rb);
-    glGenBuffers(1, &cb);
     glCreateBuffers(1, &posBuffer);
     glCreateBuffers(1, &velBuffer);
 
@@ -74,35 +74,7 @@ void Fluid::initBuffers()
 
     glBindBuffer(GL_ARRAY_BUFFER, posBuffer);
 
-    GLint loc {};
-
-	loc = glGetAttribLocation(shader, "in_position");
-    if (loc >= 0)
-    {
-        glVertexAttribPointer(loc, 4, GL_FLOAT, GL_FALSE, 0, 0); 
-        glEnableVertexAttribArray(loc);
-    }
-
-    glBindBuffer(GL_ARRAY_BUFFER, rb);
-    glBufferData(GL_ARRAY_BUFFER, 
-         radii.size() * sizeof(float),
-         radii.data(), 
-         GL_STATIC_DRAW);
-
-	loc = glGetAttribLocation(shader, "in_radius");
-    if (loc >= 0)
-    {
-        glVertexAttribPointer(loc, 1, GL_FLOAT, GL_FALSE, 0, 0); 
-        glEnableVertexAttribArray(loc);
-    }
-
-    glBindBuffer(GL_ARRAY_BUFFER, cb);
-    glBufferData(GL_ARRAY_BUFFER, 
-         colors.size() * sizeof(vec4),
-         colors.data(), 
-         GL_STATIC_DRAW);
-
-	loc = glGetAttribLocation(shader, "in_color");
+    GLint loc {glGetAttribLocation(shader, "in_position")};
     if (loc >= 0)
     {
         glVertexAttribPointer(loc, 4, GL_FLOAT, GL_FALSE, 0, 0); 

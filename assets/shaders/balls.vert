@@ -1,16 +1,15 @@
 #version 150
 
 in vec3 in_position;
-in float in_radius;
-in vec4 in_color;
 
-out vec4 color;
 out float radius;
-out float z_depth;
+out vec4 color;
 
 uniform mat4 modelToWorld;
 uniform mat4 worldToCamera;
 uniform mat4 cameraToView;
+
+uniform float in_radius = 100;
 
 void main(void)
 {
@@ -22,7 +21,6 @@ void main(void)
     float distance = length(cameraPos.xyz);
     gl_PointSize = in_radius / distance; // Adjust 100.0 to control size scaling
     
-    color = in_color;
     radius = in_radius;
-    z_depth = gl_Position.z;
+    color = vec4(in_position, 1);
 }

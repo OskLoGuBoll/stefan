@@ -1,8 +1,7 @@
 #version 150
 
-in vec4 color;
 in float radius;
-in float z_depth;
+in vec4 color;
 
 out vec4 out_color;
 
@@ -17,5 +16,5 @@ void main(void)
     // Discard fully transparent fragments
     if (alpha <= 0.0) discard;
 
-    out_color = vec4(color.rgb, color.a * alpha);
+    out_color = vec4(color.xyz, color.a * alpha);
 }

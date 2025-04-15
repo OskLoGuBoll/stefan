@@ -49,8 +49,6 @@ private:
 
 protected:
     std::vector<vec4> pointCloud;
-    std::vector<float> radii;
-    std::vector<vec4> colors;
 
     vec3 centerPosition;
 

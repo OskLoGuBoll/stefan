@@ -20,11 +20,13 @@ private:
 
     GLuint shader;
     GLuint computeShader;
+
+    GLuint fboTD;
+    GLuint fboN;
+
     GLuint vao;
     GLuint posBuffer;
     GLuint velBuffer;
-    GLuint rb;
-    GLuint cb;
 };
 
 #endif // FLUID_H
