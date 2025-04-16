@@ -1,7 +1,7 @@
 #version 150
 
-in float radius;
-in vec4 color;
+in vec4 positionInView;
+in float distanceToCam;
 
 out vec4 out_color;
 
@@ -16,5 +16,14 @@ void main(void)
     // Discard fully transparent fragments
     if (alpha <= 0.0) discard;
 
-    out_color = vec4(color.xyz, color.a * alpha);
+    // If not linear depth
+    float depth = gl_FragCoord.z;
+
+    // If linear depth
+    float near = 1.0;
+    float far = 10.0;
+    //float linearDepth = length(positionInView.xyz); // eye-space depth
+    float normalizedLinearDepth = (distanceToCam - near) / (far - near);
+
+    out_color = vec4(vec3(normalizedLinearDepth),1);
 }

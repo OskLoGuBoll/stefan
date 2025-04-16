@@ -27,14 +27,11 @@ Demo::Demo()
     glutDisplayFunc(displayWrapper);
 
 	glutRepeatingTimer(DELTA_T);
-
-    glClearColor(0.2,0.2,0.5,0);
-	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 
 	glEnable(GL_DEBUG_OUTPUT);
 
-    world.addPointCloud("fluid1", std::make_unique<Fluid>(PointCloud{"assets/models/teapot.obj", 60}, assets.getShader("balls"), assets.getShader("fluid")));
+    world.addPointCloud("fluid1", std::make_unique<Fluid>(PointCloud{"assets/models/teapot.obj", 40}, assets.getShader("balls"), assets.getShader("fluid")));
 }
 
 void Demo::run()
@@ -91,12 +88,15 @@ void Demo::logic()
 
 void Demo::display(void)
 {
+    /*
     if (!glIsEnabled(GL_DEPTH_TEST)) {
         std::cout << "OpenGL not initialized!" << std::endl;
         return;
     }
+    */
 
 	printError("pre display");
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     world.draw();

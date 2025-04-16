@@ -39,17 +39,25 @@ void World::draw() const
 {
 	mat4 worldToCamera {camera.getWorldToCamera()};
     mat4 cameraToView {camera.getProjectionMat()};
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    glDepthFunc(GL_LEQUAL);
+    glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_FALSE);
     skybox.draw(worldToCamera, cameraToView);
-
+    glDepthMask(GL_TRUE);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    
+    
     GLuint program {terrain.getShader()};
     glUseProgram(program);
     glUniform3fv(glGetUniformLocation(program, "lightSourcesDirPosArr"), 4, &lightSourcesDirectionsPositions[0].x);
     glUniform3fv(glGetUniformLocation(program, "lightSourcesColorArr"), 4, &lightSourcesColorsArr[0].x);
     glUniform1iv(glGetUniformLocation(program, "isDirectional"), 4, isDirectional);
-
+    
     terrain.draw(worldToCamera, cameraToView);
-
+    
     for (auto const& object : objects)
     {
         object.second->draw(worldToCamera, cameraToView);

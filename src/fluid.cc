@@ -26,8 +26,8 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView)
     glUniformMatrix4fv(glGetUniformLocation(shader, "worldToCamera"),
                        1, GL_TRUE, worldToCamera.m);
     glUniformMatrix4fv(glGetUniformLocation(shader, "modelToWorld"),
-                       1, GL_TRUE, T(centerPosition.x, centerPosition.y, centerPosition.z).m);                                
-
+                       1, GL_TRUE, T(centerPosition.x, centerPosition.y, centerPosition.z).m);
+    
     glBindVertexArray(vao);
     glDrawArrays(GL_POINTS, 0, pointCloud.size());
     glBindVertexArray(0);
