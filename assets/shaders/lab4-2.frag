@@ -37,7 +37,7 @@ void main(void)
 			lightDirection = normalize(lightPosInCamera.xyz - ex_Position.xyz); 
 		}
 		// Diffuse
-		float shade = kValues.y*max(0,dot(normalize(ex_Normal), lightDirection));
+		float shade = kValues.y*max(0.0,dot(normalize(ex_Normal), lightDirection));
 
 		// Specular
 		// Incident vector, I, as 0-lightDirection. Normal vector as N.
@@ -46,7 +46,7 @@ void main(void)
 		//vec3 r = vec3(2,2,2)*normalize(ex_Normal)*dot(normalize(ex_Normal), lightDirection)-lightDirection;
 
 		vec3 viewDirection = normalize(-ex_Position.xyz);
-		shade += kValues.z*max(0,pow(dot(viewDirection,r),specularStrength));
+		shade += kValues.z*max(0.0,pow(dot(viewDirection,r),specularStrength));
 		shading = shading + vec4( shade, shade, shade, 1 ) * vec4(lightSourcesColorArr[i],1);
 	}
 	// Ambient

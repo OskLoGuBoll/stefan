@@ -16,10 +16,10 @@ void main(void)
     vec4 worldPos = modelToWorld * vec4(in_position, 1.0);
     vec4 cameraPos = worldToCamera * worldPos;
     gl_Position = cameraToView * cameraPos;
-    
+
     // Perspective-correct point size calculation
-    float distance = length(cameraPos.xyz);
-    gl_PointSize = in_radius / distance; // Adjust 100.0 to control size scaling
+    float dist = length(cameraPos.xyz);
+    gl_PointSize = in_radius / dist; // Adjust 100.0 to control size scaling
     
     radius = in_radius;
     color = vec4(in_position, 1);
