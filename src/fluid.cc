@@ -1,6 +1,7 @@
 #include "fluid.h"
 
 #include <random>
+#include <GL/glext.h>
 
 Fluid::Fluid(PointCloud& cloud, GLuint shader)
 : PointCloud{cloud}, shader{shader}, vao{}, vb{}, rb{}, cb{}

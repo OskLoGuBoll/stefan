@@ -78,20 +78,20 @@ int PointCloud::LoadMesh(std::string const& filePath)
 
 	if(!triangulated)
     {
-        std::cerr << "Failed to triangulate mesh: " << filePath << std::endl;
+        std::cerr << "[X] Failed to triangulate mesh: " << filePath << std::endl;
         return 1;
     }
 
     std::ifstream input{target};
     
     if (!CGAL::IO::read_OBJ(input, mesh)) {
-        std::cerr << "❌ Failed to parse mesh from: " << target << std::endl;
+        std::cerr << "[X] Failed to parse mesh from: " << target << std::endl;
         std::cout << "CGAL version: " << CGAL_VERSION_NR << std::endl;
         return 1;
     }
 
     if (mesh.is_empty()) {
-        std::cerr << "❌ Mesh loaded but is empty!" << std::endl;
+        std::cerr << "[X] Mesh loaded but is empty!" << std::endl;
         return 1;
     }
 
