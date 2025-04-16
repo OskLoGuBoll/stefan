@@ -12,7 +12,7 @@ class Demo
 {
 public:
 
-    Demo(float, float);
+    Demo();
     ~Demo() = default;
     Demo(Demo const&) = delete;
     Demo(Demo &&) = delete;
@@ -43,7 +43,6 @@ private:
     World world;
 
     std::array<bool, 256> keyDown;
-    vec2 windowSize;
     vec2 mouseMovedVec;
     float mouseScrollLength;
     float worldTime; //In micro-seconds.

@@ -48,9 +48,7 @@ private:
     void Sampling(double const);
 
 protected:
-    std::vector<vec3> pointCloud;
-    std::vector<float> radii;
-    std::vector<vec4> colors;
+    std::vector<vec4> pointCloud;
 
     vec3 centerPosition;
 

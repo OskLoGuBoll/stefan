@@ -25,6 +25,8 @@ GLuint loadShadersGT(const char *vertFileName, const char *fragFileName, const c
 						const char *tcFileName, const char *teFileName);
 void dumpInfo(void);
 
+GLuint loadComputeShader(const char* compFileName);
+
 // This is obsolete! Use the functions in MicroGlut instead!
 //void initKeymapManager();
 //char keyIsDown(unsigned char c);

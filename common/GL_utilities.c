@@ -225,6 +225,28 @@ void dumpInfo(void)
 static GLenum lastError = 0;
 static char lastErrorFunction[1024] = "";
 
+GLuint loadComputeShader(const char* compFileName)
+{
+    char* cs;
+    GLuint p = 0;
+    GLuint c;
+
+    cs = readFile((char*) compFileName);
+
+    if (cs == NULL)
+        fprintf(stderr, "Failed to read %s from disk.\n", compFileName);
+    
+    p = glCreateProgram();
+    c = glCreateShader(GL_COMPUTE_SHADER);
+    glShaderSource(c, 1, &cs, NULL);
+    glCompileShader(c);
+    glAttachShader(p, c);
+    glLinkProgram(p);
+    
+    return p;
+}
+
+
 /* report GL errors, if any, to stderr */
 void printError(const char *functionName)
 {

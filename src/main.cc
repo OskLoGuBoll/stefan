@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 	glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 	glutCreateWindow ("STEFAN");
 
-    Demo demo1{SCREEN_WIDTH, SCREEN_HEIGHT};
+    Demo demo1{};
 
     demo1.run();
     return 0;

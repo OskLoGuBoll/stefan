@@ -8,8 +8,8 @@
 
 #define DELTA_T 8.0
 
-Demo::Demo(float width, float height)
-: assets{"assets/"}, world{assets}, keyDown{}, windowSize{width, height},
+Demo::Demo()
+: assets{"assets/"}, world{assets}, keyDown{},
     mouseMovedVec{}, mouseScrollLength{},
     worldTime{}, elapsedTime{}
 {
@@ -34,7 +34,7 @@ Demo::Demo(float width, float height)
 
 	glEnable(GL_DEBUG_OUTPUT);
 
-    world.addPointCloud("fluid1", std::make_unique<Fluid>(PointCloud{"assets/models/groundsphere.obj", 100}, assets.getShader("balls")));
+    world.addPointCloud("fluid1", std::make_unique<Fluid>(PointCloud{"assets/models/teapot.obj", 60}, assets.getShader("balls"), assets.getShader("fluid")));
 }
 
 void Demo::run()
@@ -68,9 +68,13 @@ void Demo::mouseClick(int button, int state, int x, int y)
 
 void Demo::mouseMoved(int x, int y)
 {
-	mouseMovedVec.x += x-windowSize.x/2;
-	mouseMovedVec.y += y-windowSize.y/2;
-	glutWarpPointer(windowSize.x/2,windowSize.y/2);
+    GLint viewport[4] {};
+    glGetIntegerv(GL_VIEWPORT, viewport);
+    GLint width {viewport[2]};
+    GLint height {viewport[3]};
+	mouseMovedVec.x += x-width/2;
+	mouseMovedVec.y += y-height/2;
+	glutWarpPointer(width/2,height/2);
 }
 
 void Demo::logic()
