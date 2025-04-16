@@ -5,7 +5,7 @@
 #include "lights.h"
 
 World::World(AssetManager const& assets)
-: terrain{assets.getModel("plane"), assets.getShader("lab4-2")}, skybox{assets}, objects{}, fluids{}, camera{}, program{}, nolight{}
+: terrain{assets.getModel("plane"), assets.getShader("default")}, skybox{assets}, objects{}, fluids{}, camera{}, program{}, nolight{}
 {
     // Just for test
 }

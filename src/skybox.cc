@@ -5,8 +5,8 @@
 #include <cassert>
 
 Skybox::Skybox(AssetManager const& assets) 
-: ExtModel{assets.getModel("skybox-full-tweaked"), assets.getShader("lab4-2sky")},
-    cubeMapTexture{assets.getTexture("newskyboxtex")}
+: ExtModel{assets.getModel("skybox-full-tweaked"), assets.getShader("skybox")},
+    cubeMapTexture{assets.getTexture("skyboxtexture")}
 {
     assert(glGetString(GL_VENDOR) != nullptr);  // Crash early if missing
 
