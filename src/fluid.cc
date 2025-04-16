@@ -3,34 +3,57 @@
 #include <random>
 #include <GL/glext.h>
 
-Fluid::Fluid(PointCloud& cloud, GLuint shader, GLuint computeShader)
-: PointCloud{cloud}, shader{shader}, computeShader{computeShader},
-    vao{}, posBuffer{}, velBuffer{}
+Fluid::Fluid(PointCloud& cloud, GLuint shader, GLuint computeShader,
+             GLuint depthThicknessShader, GLuint normalShader)
+: PointCloud{cloud}, shader{shader}, depthThicknessShader{depthThicknessShader},
+    normalShader{normalShader}, computeShader{computeShader}, particleVAO{},
+    frameVAO{}, fbo{}, posBuffer{}, velBuffer{}, depthThicknessTex{}, normalTex{}
 {
     initBuffers();
 }
 
-Fluid::Fluid(PointCloud&& cloud, GLuint shader, GLuint computeShader)
-: PointCloud{cloud}, shader{shader}, computeShader{computeShader},
-    vao{}, posBuffer{}, velBuffer{}
+Fluid::Fluid(PointCloud&& cloud, GLuint shader, GLuint computeShader,
+             GLuint depthThicknessShader, GLuint normalShader)
+: PointCloud{cloud}, shader{shader}, depthThicknessShader{depthThicknessShader},
+    normalShader{normalShader}, computeShader{computeShader}, particleVAO{},
+    frameVAO{}, fbo{}, posBuffer{}, velBuffer{}, depthThicknessTex{}, normalTex{}
 {
     initBuffers();
 }
 
 void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView)
 {
-    glUseProgram(shader);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glUniformMatrix4fv(glGetUniformLocation(shader, "cameraToView"),
+    glUseProgram(depthThicknessShader);
+
+    glUniformMatrix4fv(glGetUniformLocation(depthThicknessShader, "cameraToView"),
                        1, GL_TRUE, cameraToView.m);                                                
-    glUniformMatrix4fv(glGetUniformLocation(shader, "worldToCamera"),
+    glUniformMatrix4fv(glGetUniformLocation(depthThicknessShader, "worldToCamera"),
                        1, GL_TRUE, worldToCamera.m);
-    glUniformMatrix4fv(glGetUniformLocation(shader, "modelToWorld"),
+    glUniformMatrix4fv(glGetUniformLocation(depthThicknessShader, "modelToWorld"),
                        1, GL_TRUE, T(centerPosition.x, centerPosition.y, centerPosition.z).m);
-    
-    glBindVertexArray(vao);
+
+    glBindVertexArray(particleVAO);
     glDrawArrays(GL_POINTS, 0, pointCloud.size());
     glBindVertexArray(0);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glUseProgram(shader);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, depthThicknessTex);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
+    glBindVertexArray(frameVAO);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    
+    glDisable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
 }
 
 void Fluid::update(float const dt)
@@ -54,7 +77,16 @@ void Fluid::initBuffers()
     glEnable(GL_PROGRAM_POINT_SIZE);
     glEnable(GL_POINT_SPRITE);
 
-    glGenVertexArrays(1, &vao);
+    initSSBOs();
+    initVAOs();
+    initFBO();
+
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void Fluid::initSSBOs()
+{
     glCreateBuffers(1, &posBuffer);
     glCreateBuffers(1, &velBuffer);
 
@@ -71,7 +103,14 @@ void Fluid::initBuffers()
         velocities.data(), 
         GL_DYNAMIC_DRAW);
 
-    glBindVertexArray(vao);
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void Fluid::initVAOs()
+{
+    glGenVertexArrays(1, &particleVAO);
+    glBindVertexArray(particleVAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, posBuffer);
 
@@ -82,6 +121,75 @@ void Fluid::initBuffers()
         glEnableVertexAttribArray(loc);
     }
 
+    float quadVertices[] = {
+        // positions   // texCoords
+        -1.0f,  1.0f,  0.0f, 1.0f,
+        -1.0f, -1.0f,  0.0f, 0.0f,
+         1.0f, -1.0f,  1.0f, 0.0f,
+        
+        -1.0f,  1.0f,  0.0f, 1.0f,
+         1.0f, -1.0f,  1.0f, 0.0f,
+         1.0f,  1.0f,  1.0f, 1.0f
+        };
+    glGenVertexArrays(1, &frameVAO);
+    GLuint frameVBO;
+    glGenBuffers(1, &frameVBO);
+
+    glBindVertexArray(frameVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, frameVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
+    
+    loc = glGetAttribLocation(depthThicknessShader, "in_position");
+    glEnableVertexAttribArray(loc);
+    glVertexAttribPointer(loc, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+
+    loc = glGetAttribLocation(depthThicknessShader, "in_textureCoord");
+    glEnableVertexAttribArray(loc);
+    glVertexAttribPointer(loc, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), reinterpret_cast<void*>(2 * sizeof(float)));
+
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void Fluid::initFBO()
+{
+    glGenFramebuffers(1, &fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+    int viewport[4] {};
+
+    glGetIntegerv(GL_VIEWPORT, viewport);
+    int width {viewport[2]};
+    int height {viewport[3]};
+
+    glGenTextures(1, &depthThicknessTex);
+    glBindTexture(GL_TEXTURE_2D, depthThicknessTex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, depthThicknessTex, 0);
+
+    /*
+    glGenTextures(1, &normalTex);
+    glBindTexture(GL_TEXTURE_2D, normalTex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, normalTex, 0);
+
+    /*
+    GLenum drawBuffers[] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
+    glDrawBuffers(2, drawBuffers);
+*/
+    auto fboStatus {glCheckFramebufferStatus(GL_FRAMEBUFFER)};
+    if (fboStatus != GL_FRAMEBUFFER_COMPLETE)
+    {
+        std::cerr << "Framebuffer error: " << fboStatus << std::endl;
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

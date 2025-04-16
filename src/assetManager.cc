@@ -90,7 +90,7 @@ void AssetManager::loadAssets(std::string const& assetPath)
                 
                 if (fs::is_regular_file(model))
                 {
-                    std::cout << modelPath << std::endl;
+                    //std::cout << modelPath << std::endl;
                     models[key] = LoadModel(modelPath.c_str());
                 }
             }
@@ -104,7 +104,7 @@ void AssetManager::loadAssets(std::string const& assetPath)
                 
                 if (fs::is_regular_file(cloud))
                 {
-                    std::cout << cloudPath << std::endl;
+                    //std::cout << cloudPath << std::endl;
                     pointClouds[key] = PointCloud{cloudPath};
                 }
             }

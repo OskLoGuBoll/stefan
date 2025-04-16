@@ -1,23 +1,13 @@
 #version 150
 
-in vec3 in_position;
+in vec2 inPosition;
+in vec2 inTexCoord;
 
-out vec4 positionInView;
-out float distanceToCam;
+out vec2 texCoord;
 
-uniform mat4 modelToWorld;
-uniform mat4 worldToCamera;
-uniform mat4 cameraToView;
-
-uniform float in_radius = 500;
-
-void main(void)
+void main()
 {
-    vec4 worldPos = modelToWorld * vec4(in_position, 1.0);
-    positionInView = worldToCamera * worldPos;
-    gl_Position = cameraToView * positionInView;
-
-    // Perspective-correct point size calculation
-    distanceToCam = length(positionInView.xyz);
-    gl_PointSize = in_radius / distanceToCam; // Adjust 100.0 to control size scaling
+    gl_Position = vec4(inPosition, 0, 1);
+    texCoord = inTexCoord;
 }
+

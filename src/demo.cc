@@ -31,7 +31,9 @@ Demo::Demo()
 
 	glEnable(GL_DEBUG_OUTPUT);
 
-    world.addPointCloud("fluid1", std::make_unique<Fluid>(PointCloud{"assets/models/teapot.obj", 40}, assets.getShader("balls"), assets.getShader("fluid")));
+    world.addPointCloud("fluid1", std::make_unique<Fluid>(PointCloud{"assets/models/teapot.obj", 40},
+                                                          assets.getShader("balls"), assets.getShader("fluid"),
+                                                          assets.getShader("depth"), 0));
 }
 
 void Demo::run()
@@ -101,9 +103,6 @@ void Demo::display(void)
 
     world.draw();
 
-    //std::cout<<world.getObject("ball1")->getModelToWorld().m[3]<<std::endl;
-
-	//printf("%d %d \n", nr1, nr2);
 	printError("display");
 	glutSwapBuffers();
 }

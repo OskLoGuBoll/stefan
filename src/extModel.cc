@@ -1,7 +1,7 @@
 #include "extModel.h"
 
 ExtModel::ExtModel(AssetManager const& assets, vec3 const& position)
-: position{position}, texIDs{}, model{assets.getModel("groundsphere")}, shader{assets.getShader("lab4-2")}
+: position{position}, texIDs{}, model{assets.getModel("groundsphere")}, shader{assets.getShader("default")}
 {}
 
 ExtModel::ExtModel(Model* model, GLuint const shader, vec3 const& position)
