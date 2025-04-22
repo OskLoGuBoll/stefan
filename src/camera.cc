@@ -6,7 +6,7 @@
 
 Camera::Camera(vec3 const& position)
 : pitchMatrix{Rx(0)}, yawMatrix{Ry(0)}, position{position},
-    pitch{0}, yaw{0}, near{1.f}, far{200.f}, aspect{16.f/9.f}, fov{60},
+    pitch{0}, yaw{0}, near{1.f}, far{20.f}, aspect{16.f/9.f}, fov{60},
     movementSpeed{0.1}, sensitivity{0.001}
 {}
 
