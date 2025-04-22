@@ -21,8 +21,9 @@ private:
     GLuint shader;
     GLuint computeShader;
 
-    GLuint fboTD;
-    GLuint fboN;
+    GLuint framebuffer;
+    GLuint textureColorbuffer;
+    GLuint rbo;
 
     GLuint vao;
     GLuint posBuffer;

@@ -11,7 +11,7 @@ class ExtModel
 {
 public:
     ExtModel(AssetManager const&, vec3 const& = 0);
-    ExtModel(Model*, GLuint const, vec3 const& = 0);
+    ExtModel(Model*, GLuint const, std::vector<GLuint> const& = {}, vec3 const& = 0);
     ExtModel(ExtModel const&) = default;
     ExtModel(ExtModel &&) = default;
     ~ExtModel() = default;
@@ -29,9 +29,8 @@ public:
     void setPosition(double const);
 private:
     vec3 position;
-    std::vector<int> texIDs;
-
 protected:
+    std::vector<GLuint> texIDs;
     Model* model;
     GLuint shader;
 };

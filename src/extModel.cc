@@ -4,12 +4,13 @@ ExtModel::ExtModel(AssetManager const& assets, vec3 const& position)
 : position{position}, texIDs{}, model{assets.getModel("groundsphere")}, shader{assets.getShader("lab4-2")}
 {}
 
-ExtModel::ExtModel(Model* model, GLuint const shader, vec3 const& position)
-: position{position}, texIDs{}, model{model}, shader{shader}
+ExtModel::ExtModel(Model* model, GLuint const shader, std::vector<GLuint> const& textures, vec3 const& position)
+: position{position}, texIDs{textures}, model{model}, shader{shader}
 {}
 
 void ExtModel::draw(mat4 const& worldToCamera, mat4 const& cameraToView) const
 {
+    glBindTexture(GL_TEXTURE_2D, texIDs.at(0));
     glUseProgram(shader);
     glUniformMatrix4fv(glGetUniformLocation(shader, "cameraToView"), 1, GL_TRUE, cameraToView.m);                                                
     glUniformMatrix4fv(glGetUniformLocation(shader, "worldToCamera"), 1, GL_TRUE, worldToCamera.m);

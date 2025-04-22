@@ -5,7 +5,7 @@
 #include "lights.h"
 
 World::World(AssetManager const& assets)
-: terrain{assets.getModel("plane"), assets.getShader("default")}, skybox{assets}, objects{}, fluids{}, camera{}, program{}, nolight{}
+: terrain{assets.getModel("plane"), assets.getShader("default"), std::vector<GLuint>{assets.getTexture("aaa")}}, skybox{assets}, objects{}, fluids{}, camera{}, program{}, nolight{}
 {
     // Just for test
 }
@@ -37,6 +37,7 @@ ExtModel* World::getObject(std::string const& objectName) {
 
 void World::draw() const
 {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	mat4 worldToCamera {camera.getWorldToCamera()};
     mat4 cameraToView {camera.getProjectionMat()};
     vec2 frustumBounds {camera.getFrustumBounds()};
@@ -44,13 +45,7 @@ void World::draw() const
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glDepthFunc(GL_LEQUAL);
-    glEnable(GL_DEPTH_TEST);
-    glDepthMask(GL_FALSE);
-    skybox.draw(worldToCamera, cameraToView);
-    glDepthMask(GL_TRUE);
-    glClear(GL_DEPTH_BUFFER_BIT);
-    
+    skybox.draw(worldToCamera, cameraToView);    
     
     GLuint program {terrain.getShader()};
     glUseProgram(program);
