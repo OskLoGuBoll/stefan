@@ -5,6 +5,9 @@ in float distanceToCam;
 
 out vec4 out_color;
 
+uniform float near = 1;
+uniform float far = 10;
+
 void main(void)
 {
     vec2 coord = gl_PointCoord - vec2(0.5);
@@ -20,8 +23,6 @@ void main(void)
     float depth = gl_FragCoord.z;
 
     // If linear depth
-    float near = 1.0;
-    float far = 10.0;
     //float linearDepth = length(positionInView.xyz); // eye-space depth
     float normalizedLinearDepth = (distanceToCam - near) / (far - near);
 

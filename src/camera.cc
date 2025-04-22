@@ -73,3 +73,8 @@ vec3 Camera::getPosition() const
 {
     return position;
 }
+
+vec2 Camera::getFrustumBounds() const
+{
+    return vec2{near, far};
+}

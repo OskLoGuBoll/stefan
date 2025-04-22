@@ -17,7 +17,7 @@ Fluid::Fluid(PointCloud&& cloud, GLuint shader, GLuint computeShader)
     initBuffers();
 }
 
-void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView)
+void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const& frustumBounds)
 {
     glUseProgram(shader);
 
@@ -27,6 +27,8 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView)
                        1, GL_TRUE, worldToCamera.m);
     glUniformMatrix4fv(glGetUniformLocation(shader, "modelToWorld"),
                        1, GL_TRUE, T(centerPosition.x, centerPosition.y, centerPosition.z).m);
+    glUniform1f(glGetUniformLocation(shader, "near"), frustumBounds.x);
+    glUniform1f(glGetUniformLocation(shader, "far"), frustumBounds.y);
     
     glBindVertexArray(vao);
     glDrawArrays(GL_POINTS, 0, pointCloud.size());

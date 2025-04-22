@@ -21,6 +21,7 @@ public:
     mat4 getWorldToCamera() const;
     mat4 getProjectionMat() const;
     vec3 getPosition() const;
+    vec2 getFrustumBounds() const;
 
 private:
     void updatePosition(bool const*);

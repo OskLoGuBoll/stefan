@@ -39,6 +39,8 @@ void World::draw() const
 {
 	mat4 worldToCamera {camera.getWorldToCamera()};
     mat4 cameraToView {camera.getProjectionMat()};
+    vec2 frustumBounds {camera.getFrustumBounds()};
+
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -64,7 +66,7 @@ void World::draw() const
     }
     for (auto const& fluid : fluids)
     {
-        fluid.second->draw(worldToCamera, cameraToView);
+        fluid.second->draw(worldToCamera, cameraToView, frustumBounds);
     }
 }
 
