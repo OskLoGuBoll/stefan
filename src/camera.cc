@@ -6,7 +6,7 @@
 
 Camera::Camera(vec3 const& position)
 : pitchMatrix{IdentityMatrix()}, yawMatrix{IdentityMatrix()}, position{position},
-    pitch{}, yaw{}, near{1.f}, far{500.f}, aspect{16.f/9.f}, fov{60},
+    pitch{}, yaw{}, near{1.f}, far{200.f}, aspect{16.f/9.f}, fov{60},
     movementSpeed{0.1}, sensitivity{0.001}
 {}
 
