@@ -26,5 +26,5 @@ void main(void)
     //float linearDepth = length(positionInView.xyz); // eye-space depth
     float normalizedLinearDepth = (distanceToCam - near) / (far - near);
 
-    out_color = vec4(vec3(normalizedLinearDepth),1);
+    out_color = vec4(vec3(normalizedLinearDepth), 1);
 }
