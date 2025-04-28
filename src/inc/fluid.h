@@ -25,7 +25,7 @@ private:
 
     GLuint framebuffer;
     GLuint textureColorbuffer;
-    GLuint rbo;
+    GLuint textureDepthbuffer;
 
     GLuint vao;
     GLuint quadVAO;

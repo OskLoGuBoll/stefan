@@ -10,6 +10,7 @@ ExtModel::ExtModel(Model* model, GLuint const shader, std::vector<GLuint> const&
 
 void ExtModel::draw(mat4 const& worldToCamera, mat4 const& cameraToView) const
 {
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texIDs.at(0));
     glUseProgram(shader);
     glUniformMatrix4fv(glGetUniformLocation(shader, "cameraToView"), 1, GL_TRUE, cameraToView.m);                                                

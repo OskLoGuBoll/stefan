@@ -38,6 +38,7 @@ void AssetManager::loadAssets(std::string const& assetPath)
                 }
                 else if (fs::is_regular_file(texture))
                 {
+                    glActiveTexture(GL_TEXTURE0);
                     LoadTGATextureSimple(texture.path().string().c_str(), &textures[key]);
                 }
                 else
