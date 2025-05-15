@@ -3,16 +3,16 @@
 #include <random>
 #include <GL/glext.h>
 
-Fluid::Fluid(PointCloud& cloud, GLuint shader, GLuint screenShader, GLuint computeShader)
+Fluid::Fluid(PointCloud& cloud, GLuint shader, GLuint screenShader, GLuint computeShader, GLuint blurShader)
 : PointCloud{cloud}, shader{shader}, screenShader{screenShader}, computeShader{computeShader},
-    vao{}, posBuffer{}, velBuffer{}
+    blurShader{blurShader}, vao{}, posBuffer{}, velBuffer{}
 {
     initBuffers();
 }
 
-Fluid::Fluid(PointCloud&& cloud, GLuint shader, GLuint screenShader, GLuint computeShader)
+Fluid::Fluid(PointCloud&& cloud, GLuint shader, GLuint screenShader, GLuint computeShader, GLuint blurShader)
 : PointCloud{cloud}, shader{shader}, screenShader{screenShader}, computeShader{computeShader},
-    vao{}, posBuffer{}, velBuffer{}
+    blurShader{blurShader}, vao{}, posBuffer{}, velBuffer{}
 {
     initBuffers();
 }
@@ -41,10 +41,29 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const
     glDrawArrays(GL_POINTS, 0, pointCloud.size());
     glBindVertexArray(0);
 
+    GLint viewport[4] {};
+    glGetIntegerv(GL_VIEWPORT, viewport);
+    GLint width {viewport[2]};
+    GLint height {viewport[3]};
+    vec2 u_scale {10.0f/width, 10.0f/height};
+    
+    
+    glUseProgram(blurShader);
+    glBindVertexArray(quadVAO);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, textureDepthbuffer);
+    glUniform2fv(glGetUniformLocation(blurShader, "u_Scale"), 1, &u_scale.x);
+    glUniform1i(glGetUniformLocation(blurShader, "blurBuffer"), 0);
+    //glUniform1i(glGetUniformLocation(blurShader, "screenDepth"), 1);
+    
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    
     // second pass
     glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
     //glDisable(GL_DEPTH_TEST);
-
+    
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -58,6 +77,8 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const
     glUniform1i(glGetUniformLocation(screenShader, "grebuky"), 0);
     glUniform1i(glGetUniformLocation(screenShader, "screenDepth"), 1);
     glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    
 }
 
 void Fluid::update(float const dt)

@@ -8,8 +8,8 @@
 class Fluid : public PointCloud
 {
 public:
-    Fluid(PointCloud&, GLuint, GLuint, GLuint);
-    Fluid(PointCloud&&, GLuint, GLuint, GLuint);
+    Fluid(PointCloud&, GLuint, GLuint, GLuint, GLuint);
+    Fluid(PointCloud&&, GLuint, GLuint, GLuint, GLuint);
 
     void draw(mat4 const&, mat4 const&, vec2 const&);
     void update(float const);
@@ -22,6 +22,7 @@ private:
     GLuint shader;
     GLuint screenShader;
     GLuint computeShader;
+    GLuint blurShader;
 
     GLuint framebuffer;
     GLuint textureColorbuffer;
