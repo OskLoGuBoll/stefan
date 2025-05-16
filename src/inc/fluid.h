@@ -24,9 +24,12 @@ private:
     GLuint computeShader;
     GLuint blurShader;
 
-    GLuint framebuffer;
-    GLuint textureColorbuffer;
-    GLuint textureDepthbuffer;
+    GLuint framebufferA;
+    GLuint textureColorbufferA;
+    GLuint textureDepthbufferA;
+    GLuint framebufferB;
+    GLuint textureColorbufferB;
+    GLuint textureDepthbufferB;
 
     GLuint vao;
     GLuint quadVAO;
