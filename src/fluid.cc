@@ -3,16 +3,14 @@
 #include <random>
 #include <GL/glext.h>
 
-Fluid::Fluid(PointCloud& cloud, GLuint shader, GLuint screenShader, GLuint computeShader, GLuint blurShader)
-: PointCloud{cloud}, shader{shader}, screenShader{screenShader}, computeShader{computeShader},
-    blurShader{blurShader}, vao{}, posBuffer{}, velBuffer{}
+Fluid::Fluid(PointCloud& cloud, FluidShaders const& shaders)
+: PointCloud{cloud}, shaders{shaders}, vao{}, posBuffer{}, velBuffer{}
 {
     initBuffers();
 }
 
-Fluid::Fluid(PointCloud&& cloud, GLuint shader, GLuint screenShader, GLuint computeShader, GLuint blurShader)
-: PointCloud{cloud}, shader{shader}, screenShader{screenShader}, computeShader{computeShader},
-    blurShader{blurShader}, vao{}, posBuffer{}, velBuffer{}
+Fluid::Fluid(PointCloud&& cloud, FluidShaders const& shaders)
+: PointCloud{cloud}, shaders{shaders}, vao{}, posBuffer{}, velBuffer{}
 {
     initBuffers();
 }
@@ -24,16 +22,16 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // we're not using the stencil buffer now
     glEnable(GL_DEPTH_TEST);
-    glUseProgram(shader);
+    glUseProgram(shaders.depth);
 
-    glUniformMatrix4fv(glGetUniformLocation(shader, "cameraToView"),
+    glUniformMatrix4fv(glGetUniformLocation(shaders.depth, "cameraToView"),
                        1, GL_TRUE, cameraToView.m);                                                
-    glUniformMatrix4fv(glGetUniformLocation(shader, "worldToCamera"),
+    glUniformMatrix4fv(glGetUniformLocation(shaders.depth, "worldToCamera"),
                        1, GL_TRUE, worldToCamera.m);
-    glUniformMatrix4fv(glGetUniformLocation(shader, "modelToWorld"),
+    glUniformMatrix4fv(glGetUniformLocation(shaders.depth, "modelToWorld"),
                        1, GL_TRUE, T(centerPosition.x, centerPosition.y, centerPosition.z).m);
-    glUniform1f(glGetUniformLocation(shader, "near"), frustumBounds.x);
-    glUniform1f(glGetUniformLocation(shader, "far"), frustumBounds.y);
+    glUniform1f(glGetUniformLocation(shaders.depth, "near"), frustumBounds.x);
+    glUniform1f(glGetUniformLocation(shaders.depth, "far"), frustumBounds.y);
     
     glBindVertexArray(vao);
     glDrawArrays(GL_POINTS, 0, pointCloud.size());
@@ -43,46 +41,68 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const
     glGetIntegerv(GL_VIEWPORT, viewport);
     GLint width {viewport[2]};
     GLint height {viewport[3]};
-    vec2 u_scale {10.0f/width, 10.0f/height};
+    vec2 u_scale {1.0f/width, 1.0f/height};
     
     // Second pass
     glBindFramebuffer(GL_FRAMEBUFFER, framebufferB);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
-    glUseProgram(blurShader);
+    glUseProgram(shaders.blur);
     glBindVertexArray(quadVAO);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, textureColorbufferA);
-    glUniform1i(glGetUniformLocation(blurShader, "blurBuffer"), 0);
+    glUniform1i(glGetUniformLocation(shaders.blur, "colorBuffer"), 0);
 
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, textureDepthbufferA);
-    glUniform1i(glGetUniformLocation(blurShader, "screenDepth"), 1);
-    glUniform2fv(glGetUniformLocation(blurShader, "u_Scale"), 1, &u_scale.x);
+    glUniform1i(glGetUniformLocation(shaders.blur, "screenDepth"), 1);
+    glUniform2fv(glGetUniformLocation(shaders.blur, "u_Scale"), 1, &u_scale.x);
 
-    glUniform1f(glGetUniformLocation(blurShader, "near"), frustumBounds.x);
-    glUniform1f(glGetUniformLocation(blurShader, "far"), frustumBounds.y);
+    glUniform1f(glGetUniformLocation(shaders.blur, "near"), frustumBounds.x);
+    glUniform1f(glGetUniformLocation(shaders.blur, "far"), frustumBounds.y);
     
     glDrawArrays(GL_TRIANGLES, 0, 6);
     
     // Third pass
+    glBindFramebuffer(GL_FRAMEBUFFER, framebufferA);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_DEPTH_TEST);
+    glUseProgram(shaders.normal);
+    glBindVertexArray(quadVAO);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, textureColorbufferB);
+    glUniform1i(glGetUniformLocation(shaders.normal, "colorBuffer"), 0);
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, textureDepthbufferB);
+    glUniform1i(glGetUniformLocation(shaders.normal, "screenDepth"), 1);
+    glUniformMatrix4fv(glGetUniformLocation(shaders.normal, "cameraToView"),
+                       1, GL_TRUE, cameraToView.m);
+    glUniform2fv(glGetUniformLocation(shaders.normal, "texelSize"), 1, &u_scale.x);
+
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    
+
+    // Fourth pass
     glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
     
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
 
-    glUseProgram(screenShader);
+    glUseProgram(shaders.composite);
     
     glBindVertexArray(quadVAO);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, textureColorbufferB);
+    glBindTexture(GL_TEXTURE_2D, textureColorbufferA);
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, textureDepthbufferB);
-    glUniform1i(glGetUniformLocation(screenShader, "grebuky"), 0);
-    glUniform1i(glGetUniformLocation(screenShader, "screenDepth"), 1);
+    glBindTexture(GL_TEXTURE_2D, textureDepthbufferA);
+    glUniform1i(glGetUniformLocation(shaders.composite, "grebuky"), 0);
+    glUniform1i(glGetUniformLocation(shaders.composite, "screenDepth"), 1);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
     
@@ -90,18 +110,18 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const
 
 void Fluid::update(float const dt)
 {
-    glUseProgram(computeShader);
+    glUseProgram(shaders.computeShader);
 
-    glUniform1f(glGetUniformLocation(computeShader, "dt"), dt);
+    glUniform1f(glGetUniformLocation(shaders.computeShader, "dt"), dt);
 
     glDispatchCompute((pointCloud.size() + 63) / 64, 1, 1);
 
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 }
 
-GLuint Fluid::getShader() const
+Fluid::FluidShaders Fluid::getShaders() const
 {
-    return shader;
+    return shaders;
 }
 
 void Fluid::initBuffers()
@@ -130,7 +150,7 @@ void Fluid::initBuffers()
 
     glBindBuffer(GL_ARRAY_BUFFER, posBuffer);
 
-    GLint loc {glGetAttribLocation(shader, "in_position")};
+    GLint loc {glGetAttribLocation(shaders.depth, "in_position")};
     if (loc >= 0)
     {
         glVertexAttribPointer(loc, 4, GL_FLOAT, GL_FALSE, 0, 0); 
@@ -233,13 +253,13 @@ void Fluid::initScreenSpaceQuad()
     glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
 
-    GLint loc {glGetAttribLocation(screenShader, "in_Position")};
+    GLint loc {glGetAttribLocation(shaders.composite, "in_Position")};
 
     // Position attribute
     glEnableVertexAttribArray(loc);
     glVertexAttribPointer(loc, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
 
-    loc = glGetAttribLocation(screenShader, "in_TexCoords");
+    loc = glGetAttribLocation(shaders.composite, "in_TexCoords");
     // TexCoord attribute
     glEnableVertexAttribArray(loc);
     glVertexAttribPointer(loc, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));

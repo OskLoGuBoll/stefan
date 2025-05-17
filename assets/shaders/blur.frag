@@ -1,9 +1,9 @@
-#version 150
+#version 430
 
 in vec2 ex_BufferCoord;
 out vec4 FragColor;
 
-uniform sampler2D blurBuffer;
+uniform sampler2D colorBuffer;
 uniform sampler2D screenDepth;
 uniform vec2 u_Scale;
 uniform float near;
@@ -21,12 +21,9 @@ const vec2 gaussFilter[7] = vec2[]
 );
 
 float getLinearDepth(vec2 uv) {
-	//float near = 1.0; // Should be uniform
-	//float far = 20.0; // Should be uniform
     float d = texture(screenDepth, uv).r;
 	float z = d * 2.0 - 1.0;
     return (2.0 * near * far) / (far + near - z * (far - near));
-    return d;
 }
 
 void main()
@@ -41,10 +38,10 @@ void main()
     for (int i = 0; i < 7; ++i) {
         for (int j = 0; j < 7; ++j) 
         {
-            vec2 offset = vec2(gaussFilter[i].x, gaussFilter[j].x)*u_Scale;
+            vec2 offset = vec2(gaussFilter[i].x, gaussFilter[j].x) * u_Scale * 5;
             vec2 sampleCoords = ex_BufferCoord + offset;
 
-            vec4 sampleColor = texture(blurBuffer, sampleCoords);
+            vec4 sampleColor = texture(colorBuffer, sampleCoords);
             float spatialWeight = gaussFilter[i].y * gaussFilter[j].y;
 
             float sampleDepth = getLinearDepth(sampleCoords);

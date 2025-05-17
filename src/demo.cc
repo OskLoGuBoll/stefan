@@ -3,6 +3,7 @@
 
 #include "MicroGlut.h"
 #include "pointCloud.h"
+#include "fluid.h"
 
 #include <iostream>
 
@@ -31,11 +32,13 @@ Demo::Demo()
 
 	glEnable(GL_DEBUG_OUTPUT);
 
-    world.addPointCloud("fluid1", std::make_unique<Fluid>(PointCloud{"assets/models/teapot.obj", 40},
+    world.addPointCloud("fluid1", std::make_unique<Fluid>(PointCloud{"assets/models/teapot.obj", 40}, Fluid::FluidShaders{
                                                           assets.getShader("depth"),
+                                                          assets.getShader("blur"),
+                                                          assets.getShader("fluidnormals"),
                                                           assets.getShader("balls"),
                                                           assets.getShader("fluid"),
-                                                          assets.getShader("blur")));
+                                                          }));
 }
 
 void Demo::run()
@@ -92,22 +95,12 @@ void Demo::logic()
 
 void Demo::display(void)
 {
-    /*
-    if (!glIsEnabled(GL_DEPTH_TEST)) {
-        std::cout << "OpenGL not initialized!" << std::endl;
-        return;
-    }
-    */
-
 	printError("pre display");
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     world.draw();
 
-    //std::cout<<world.getObject("ball1")->getModelToWorld().m[3]<<std::endl;
-
-	//printf("%d %d \n", nr1, nr2);
 	printError("display");
 	glutSwapBuffers();
 }

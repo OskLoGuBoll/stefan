@@ -1,4 +1,4 @@
-#version 150
+#version 430
 
 in vec3 ex_TextureCoord;
 out vec4 out_Color;

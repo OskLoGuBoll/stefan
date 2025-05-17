@@ -1,11 +1,12 @@
 #version 430
+
 in vec2 in_Position;
 in vec2 in_TexCoords;
 
-out vec2 TexCoords;
+out vec2 ex_BufferCoord;
 
 void main()
 {
     gl_Position = vec4(in_Position, 0.0, 1.0);
-    TexCoords = in_TexCoords;
+    ex_BufferCoord = in_TexCoords;
 }
