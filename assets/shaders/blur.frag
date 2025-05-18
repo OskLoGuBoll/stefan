@@ -28,7 +28,7 @@ float getLinearDepth(vec2 uv) {
 
 void main()
 {
-	float depthParam = 10; // Should be uniform
+	float depthParam = 1; // Should be uniform
     // vec4 centerColor = texture(blurBuffer, ex_BufferCoord); // Used for full bilateral blur
     float centerDepth = getLinearDepth(ex_BufferCoord);
 
@@ -38,7 +38,7 @@ void main()
     for (int i = 0; i < 7; ++i) {
         for (int j = 0; j < 7; ++j) 
         {
-            vec2 offset = vec2(gaussFilter[i].x, gaussFilter[j].x) * u_Scale * 5;
+            vec2 offset = vec2(gaussFilter[i].x, gaussFilter[j].x) * u_Scale;
             vec2 sampleCoords = ex_BufferCoord + offset;
 
             vec4 sampleColor = texture(colorBuffer, sampleCoords);

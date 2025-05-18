@@ -17,6 +17,12 @@ Fluid::Fluid(PointCloud&& cloud, FluidShaders const& shaders)
 
 void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const& frustumBounds)
 {
+    GLint viewport[4] {};
+    glGetIntegerv(GL_VIEWPORT, viewport);
+    GLint width {viewport[2]};
+    GLint height {viewport[3]};
+    vec2 u_scale {1.0f/width, 1.0f/height};
+
     // First pass
     glBindFramebuffer(GL_FRAMEBUFFER, framebufferA);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -30,18 +36,10 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const
                        1, GL_TRUE, worldToCamera.m);
     glUniformMatrix4fv(glGetUniformLocation(shaders.depth, "modelToWorld"),
                        1, GL_TRUE, T(centerPosition.x, centerPosition.y, centerPosition.z).m);
-    glUniform1f(glGetUniformLocation(shaders.depth, "near"), frustumBounds.x);
-    glUniform1f(glGetUniformLocation(shaders.depth, "far"), frustumBounds.y);
     
     glBindVertexArray(vao);
     glDrawArrays(GL_POINTS, 0, pointCloud.size());
     glBindVertexArray(0);
-
-    GLint viewport[4] {};
-    glGetIntegerv(GL_VIEWPORT, viewport);
-    GLint width {viewport[2]};
-    GLint height {viewport[3]};
-    vec2 u_scale {1.0f/width, 1.0f/height};
     
     // Second pass
     glBindFramebuffer(GL_FRAMEBUFFER, framebufferB);
