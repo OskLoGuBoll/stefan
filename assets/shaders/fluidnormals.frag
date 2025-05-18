@@ -40,12 +40,20 @@ void main()
     vec3 pos = uvToPosition(ex_BufferCoord, depth);
 
     vec3 ddx = getPosition(ex_BufferCoord + vec2(texelSize.x, 0)) - pos;
+    vec3 ddx2 = pos - getPosition(ex_BufferCoord + vec2(-texelSize.x, 0));
+    if (abs(ddx.z) > abs(ddx2.z)) {
+         ddx = ddx2;
+    }
 
     vec3 ddy = getPosition(ex_BufferCoord + vec2(0, texelSize.y)) - pos;
+    vec3 ddy2 = pos - getPosition(ex_BufferCoord + vec2(0, -texelSize.y));
+    if (abs(ddy.z) > abs(ddy2.z)) {
+         ddy = ddy2;
+    }
 
     vec3 normal = normalize(cross(ddx, ddy));
 
-    NormalColor = vec4(normal, 1);
+    NormalColor = vec4(normal*0.5+0.5, 1);
 
 	gl_FragDepth = texture(screenDepth, ex_BufferCoord).r;
 }

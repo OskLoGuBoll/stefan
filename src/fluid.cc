@@ -42,6 +42,7 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const
     glBindVertexArray(0);
     
     // Second pass
+    /*
     glBindFramebuffer(GL_FRAMEBUFFER, framebufferB);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -62,9 +63,10 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const
     glUniform1f(glGetUniformLocation(shaders.blur, "far"), frustumBounds.y);
     
     glDrawArrays(GL_TRIANGLES, 0, 6);
-    
+    */
     // Third pass
-    glBindFramebuffer(GL_FRAMEBUFFER, framebufferA);
+    
+    glBindFramebuffer(GL_FRAMEBUFFER, framebufferB);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
@@ -72,17 +74,18 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const
     glBindVertexArray(quadVAO);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, textureColorbufferB);
+    glBindTexture(GL_TEXTURE_2D, textureColorbufferA);
     glUniform1i(glGetUniformLocation(shaders.normal, "colorBuffer"), 0);
 
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, textureDepthbufferB);
+    glBindTexture(GL_TEXTURE_2D, textureDepthbufferA);
     glUniform1i(glGetUniformLocation(shaders.normal, "screenDepth"), 1);
     glUniformMatrix4fv(glGetUniformLocation(shaders.normal, "cameraToView"),
                        1, GL_TRUE, cameraToView.m);
     glUniform2fv(glGetUniformLocation(shaders.normal, "texelSize"), 1, &u_scale.x);
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
+    
     
 
     // Fourth pass
@@ -96,9 +99,9 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const
     
     glBindVertexArray(quadVAO);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, textureColorbufferA);
+    glBindTexture(GL_TEXTURE_2D, textureColorbufferB);
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, textureDepthbufferA);
+    glBindTexture(GL_TEXTURE_2D, textureDepthbufferB);
     glUniform1i(glGetUniformLocation(shaders.composite, "grebuky"), 0);
     glUniform1i(glGetUniformLocation(shaders.composite, "screenDepth"), 1);
     glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -170,7 +173,7 @@ void Fluid::initBuffers()
     // generate color-texture
     glGenTextures(1, &textureColorbufferA);
     glBindTexture(GL_TEXTURE_2D, textureColorbufferA);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -202,7 +205,7 @@ void Fluid::initBuffers()
     // generate color-texture
     glGenTextures(1, &textureColorbufferB);
     glBindTexture(GL_TEXTURE_2D, textureColorbufferB);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
