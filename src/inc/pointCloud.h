@@ -47,15 +47,14 @@ private:
     void BuildAABBTree();
     void Sampling(double const);
 
-protected:
-    std::vector<vec4> pointCloud;
-
-    vec3 centerPosition;
-
     Mesh mesh;
     Tree tree;
     PointInside* insideTester;
 
+protected:
+    std::vector<vec4> pointCloud;
+
+    vec3 centerPosition;
 };
 
 #endif
