@@ -21,13 +21,20 @@ void main()
 
     v += vec3(0, -9.82*dt, 0);
 
-    p += v*dt;
 
-    if (p.y < 0 || p.x < -100 || p.x > 100)
+    if (p.y < 0)
     {
-        v *= -0.9;
-        p += v*dt;
+        v.y *= -0.9;
     }
+    if (p.x < -5 || p.x > 5)
+    {
+        v.x *= -0.9;
+    }
+    if (p.z < -5 || p.z > 5)
+    {
+        v.z *= -0.9;
+    }
+    p += v*dt;
 
     positions[i] = vec4(p, 0);
     velocities[i] = vec4(v, 0);

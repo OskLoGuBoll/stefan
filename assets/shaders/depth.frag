@@ -28,7 +28,7 @@ void main(void)
     normal = normal*0.5+0.5;
 
 
-    vec4 surfacePos = cameraToView * (positionInView + vec4(normal, 1));
+    vec4 surfacePos = cameraToView * vec4(positionInView.xyz + normal, 1);
     
     float depth = surfacePos.z / surfacePos.w * 0.5 + 0.5;
     gl_FragDepth = depth;
