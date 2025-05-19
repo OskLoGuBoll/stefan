@@ -29,6 +29,7 @@ private:
 
     void initBuffers();
     void initScreenSpaceQuad();
+    void switchFramebuffer();
 
     FluidShaders shaders;
 
@@ -38,6 +39,10 @@ private:
     GLuint framebufferB;
     GLuint textureColorbufferB;
     GLuint textureDepthbufferB;
+    GLuint framebuffer;
+    GLuint textureDepthbuffer;
+    GLuint textureColorbuffer;
+
 
     GLuint vao;
     GLuint quadVAO;

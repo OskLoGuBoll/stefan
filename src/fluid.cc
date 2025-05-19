@@ -22,9 +22,10 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const
     GLint width {viewport[2]};
     GLint height {viewport[3]};
     vec2 u_scale {1.0f/width, 1.0f/height};
-
-    // First pass
-    glBindFramebuffer(GL_FRAMEBUFFER, framebufferA);
+    
+    // First pass, depth
+    switchFramebuffer();
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // we're not using the stencil buffer now
     glEnable(GL_DEPTH_TEST);
@@ -41,9 +42,10 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const
     glDrawArrays(GL_POINTS, 0, pointCloud.size());
     glBindVertexArray(0);
     
-    // Second pass
     
-    glBindFramebuffer(GL_FRAMEBUFFER, framebufferB);
+    // Second pass, blur
+    switchFramebuffer();
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
@@ -51,11 +53,11 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const
     glBindVertexArray(quadVAO);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, textureColorbufferA);
+    glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
     glUniform1i(glGetUniformLocation(shaders.blur, "colorBuffer"), 0);
 
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, textureDepthbufferA);
+    glBindTexture(GL_TEXTURE_2D, textureDepthbuffer);
     glUniform1i(glGetUniformLocation(shaders.blur, "screenDepth"), 1);
     glUniform2fv(glGetUniformLocation(shaders.blur, "u_Scale"), 1, &u_scale.x);
 
@@ -64,9 +66,9 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const
     
     glDrawArrays(GL_TRIANGLES, 0, 6);
     
-    // Third pass
-    
-    glBindFramebuffer(GL_FRAMEBUFFER, framebufferA);
+    // Third pass, normal calculation
+    switchFramebuffer();
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
@@ -74,19 +76,21 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const
     glBindVertexArray(quadVAO);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, textureColorbufferB);
+    glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
     glUniform1i(glGetUniformLocation(shaders.normal, "colorBuffer"), 0);
 
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, textureDepthbufferB);
+    glBindTexture(GL_TEXTURE_2D, textureDepthbuffer);
     glUniform1i(glGetUniformLocation(shaders.normal, "screenDepth"), 1);
     glUniformMatrix4fv(glGetUniformLocation(shaders.normal, "cameraToView"),
                        1, GL_TRUE, cameraToView.m);
     glUniform2fv(glGetUniformLocation(shaders.normal, "texelSize"), 1, &u_scale.x);
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
+    
 
-    // Fourth pass
+    // Fourth pass, render to screen
+    switchFramebuffer();
     glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
     
     glEnable(GL_BLEND);
@@ -97,9 +101,9 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const
     
     glBindVertexArray(quadVAO);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, textureColorbufferA);
+    glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, textureDepthbufferA);
+    glBindTexture(GL_TEXTURE_2D, textureDepthbuffer);
     glUniform1i(glGetUniformLocation(shaders.composite, "grebuky"), 0);
     glUniform1i(glGetUniformLocation(shaders.composite, "screenDepth"), 1);
     glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -264,4 +268,19 @@ void Fluid::initScreenSpaceQuad()
     glVertexAttribPointer(loc, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 
     glBindVertexArray(0);
+}
+
+void Fluid::switchFramebuffer()
+{
+    if (framebuffer == framebufferB)
+    {
+        textureColorbuffer = textureColorbufferB;
+        textureDepthbuffer = textureDepthbufferB;
+        framebuffer = framebufferA;
+    } else {
+        textureColorbuffer = textureColorbufferA;
+        textureDepthbuffer = textureDepthbufferA;
+        framebuffer = framebufferB;
+    }
+    return;
 }
