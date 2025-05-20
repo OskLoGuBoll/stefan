@@ -37,6 +37,7 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const
                        1, GL_TRUE, worldToCamera.m);
     glUniformMatrix4fv(glGetUniformLocation(shaders.depth, "modelToWorld"),
                        1, GL_TRUE, T(centerPosition.x, centerPosition.y, centerPosition.z).m);
+    glUniform1f(glGetUniformLocation(shaders.depth, "in_radius"), height/2);
     
     glBindVertexArray(vao);
     glDrawArrays(GL_POINTS, 0, pointCloud.size());
@@ -142,7 +143,7 @@ void Fluid::initBuffers()
          pointCloud.data(), 
          GL_DYNAMIC_DRAW);
 
-    std::vector<vec4> velocities(pointCloud.size(), vec4(0.0f));
+    std::vector<vec4> velocities(pointCloud.size(), vec4(10.0f));
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, velBuffer);
     glBufferData(GL_SHADER_STORAGE_BUFFER, 
         velocities.size() * sizeof(vec4),

@@ -6,8 +6,8 @@
 
 Camera::Camera(vec3 const& position)
 : pitchMatrix{Rx(0)}, yawMatrix{Ry(0)}, position{position},
-    pitch{0}, yaw{0}, near{1.f}, far{20.f}, aspect{16.f/9.f}, fov{60},
-    movementSpeed{0.1}, sensitivity{0.001}
+    pitch{0}, yaw{0}, near{0.5f}, far{100.f}, aspect{16.f/9.f}, fov{60},
+    movementSpeed{0.2}, sensitivity{0.001}
 {}
 
 void Camera::handleInput(vec2 const& mouseMovedVec, bool const* keyDown)

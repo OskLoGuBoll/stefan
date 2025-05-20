@@ -21,16 +21,15 @@ void main()
 
     v += vec3(0, -9.82*dt, 0);
 
-
-    if (p.y < 0)
+    if (p.y + v.y*dt < 0)
     {
         v.y *= -0.9;
     }
-    if (p.x < -5 || p.x > 5)
+    if (p.x + v.x*dt < -8 || p.x + v.x*dt > 8)
     {
         v.x *= -0.9;
     }
-    if (p.z < -5 || p.z > 5)
+    if (p.z + v.z*dt < -8 || p.z + v.z*dt  > 8)
     {
         v.z *= -0.9;
     }
