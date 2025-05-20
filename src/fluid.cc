@@ -37,7 +37,9 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const
                        1, GL_TRUE, worldToCamera.m);
     glUniformMatrix4fv(glGetUniformLocation(shaders.depth, "modelToWorld"),
                        1, GL_TRUE, T(centerPosition.x, centerPosition.y, centerPosition.z).m);
-    glUniform1f(glGetUniformLocation(shaders.depth, "in_radius"), height/2);
+    glUniform1f(glGetUniformLocation(shaders.depth, "in_radius"), height/4);
+    glUniform1f(glGetUniformLocation(shaders.depth, "far"), frustumBounds.y);
+    glUniform1f(glGetUniformLocation(shaders.depth, "particleCount"), pointCloud.size());
     
     glBindVertexArray(vao);
     glDrawArrays(GL_POINTS, 0, pointCloud.size());
@@ -89,8 +91,29 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
     
+    // Fourth pass, composite
+    switchFramebuffer();
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_DEPTH_TEST);
+    glUseProgram(shaders.composite);
+    glBindVertexArray(quadVAO);
 
-    // Fourth pass, render to screen
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
+    glUniform1i(glGetUniformLocation(shaders.composite, "colorBuffer"), 0);
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, textureDepthbuffer);
+    glUniform1i(glGetUniformLocation(shaders.composite, "screenDepth"), 1);
+
+    glUniformMatrix4fv(glGetUniformLocation(shaders.composite, "worldToCamera"),
+                       1, GL_TRUE, worldToCamera.m);
+
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    // Fifth pass, render to screen
     switchFramebuffer();
     glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
     
@@ -98,15 +121,15 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
 
-    glUseProgram(shaders.composite);
+    glUseProgram(shaders.screen);
     
     glBindVertexArray(quadVAO);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, textureDepthbuffer);
-    glUniform1i(glGetUniformLocation(shaders.composite, "grebuky"), 0);
-    glUniform1i(glGetUniformLocation(shaders.composite, "screenDepth"), 1);
+    glUniform1i(glGetUniformLocation(shaders.screen, "grebuky"), 0);
+    glUniform1i(glGetUniformLocation(shaders.screen, "screenDepth"), 1);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
     
@@ -143,7 +166,17 @@ void Fluid::initBuffers()
          pointCloud.data(), 
          GL_DYNAMIC_DRAW);
 
-    std::vector<vec4> velocities(pointCloud.size(), vec4(10.0f));
+    std::vector<vec4> velocities(pointCloud.size(), vec4(0.0f));
+    
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> distr(-10, 10);
+
+    for (auto& v : velocities)
+    {
+        v = vec4(distr(gen), distr(gen), distr(gen), 1);
+    }
+
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, velBuffer);
     glBufferData(GL_SHADER_STORAGE_BUFFER, 
         velocities.size() * sizeof(vec4),

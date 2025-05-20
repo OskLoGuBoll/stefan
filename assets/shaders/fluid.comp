@@ -11,6 +11,7 @@ layout(std430, binding = 1) buffer velBuffer {
 };
 
 uniform float dt;
+uniform float elasticity = 0.7;
 
 void main()
 {
@@ -23,15 +24,15 @@ void main()
 
     if (p.y + v.y*dt < 0)
     {
-        v.y *= -0.9;
+        v.y *= -elasticity;
     }
     if (p.x + v.x*dt < -8 || p.x + v.x*dt > 8)
     {
-        v.x *= -0.9;
+        v.x *= -elasticity;
     }
     if (p.z + v.z*dt < -8 || p.z + v.z*dt  > 8)
     {
-        v.z *= -0.9;
+        v.z *= -elasticity;
     }
     p += v*dt;
 

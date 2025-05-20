@@ -14,6 +14,7 @@ public:
         GLuint blur;
         GLuint normal;
         GLuint composite;
+        GLuint screen;
 
         GLuint computeShader;
     };
