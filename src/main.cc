@@ -2,8 +2,8 @@
 
 #include "demo.h"
 
-#define SCREEN_WIDTH 2560.0
-#define SCREEN_HEIGHT 1440.0
+#define SCREEN_WIDTH 1920.0
+#define SCREEN_HEIGHT 1080.0
 
 int main(int argc, char *argv[])
 {

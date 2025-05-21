@@ -63,8 +63,10 @@ void main(void)
 
     vec4 surfacePos = cameraToView * vec4(positionInView.xyz + normal, 1);
     
-    float depth = surfacePos.z / surfacePos.w * 0.5 + 0.5;
-    gl_FragDepth = depth;
+    float depth = surfacePos.z / surfacePos.w;
+    float z = depth * 2.0 - 1.0;
+    float linearDepth = (2.0 * 1.0) / (20.0 + 1.0 - z * (20.0 - 1.0));
+    gl_FragDepth = depth*0.5+0.5;
 
-    out_color = vec4(depth, 0, 0, 1);
+    out_color = vec4(vec3(linearDepth), 1);
 }

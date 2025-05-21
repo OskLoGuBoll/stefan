@@ -37,7 +37,7 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const
                        1, GL_TRUE, worldToCamera.m);
     glUniformMatrix4fv(glGetUniformLocation(shaders.depth, "modelToWorld"),
                        1, GL_TRUE, T(centerPosition.x, centerPosition.y, centerPosition.z).m);
-    glUniform1f(glGetUniformLocation(shaders.depth, "in_radius"), height/4);
+    glUniform1f(glGetUniformLocation(shaders.depth, "in_radius"), height/2);
     glUniform1f(glGetUniformLocation(shaders.depth, "far"), frustumBounds.y);
     glUniform1f(glGetUniformLocation(shaders.depth, "particleCount"), pointCloud.size());
     
@@ -70,6 +70,7 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const
     glDrawArrays(GL_TRIANGLES, 0, 6);
     
     // Third pass, normal calculation
+    
     switchFramebuffer();
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -92,6 +93,7 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const
     glDrawArrays(GL_TRIANGLES, 0, 6);
     
     // Fourth pass, composite
+    /*
     switchFramebuffer();
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -99,6 +101,14 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const
     glEnable(GL_DEPTH_TEST);
     glUseProgram(shaders.composite);
     glBindVertexArray(quadVAO);
+
+    glUniformMatrix4fv(glGetUniformLocation(shaders.composite, "cameraToView"),
+    1, GL_TRUE, cameraToView.m);                                                
+    glUniformMatrix4fv(glGetUniformLocation(shaders.composite, "worldToCamera"),
+        1, GL_TRUE, worldToCamera.m);
+    glUniformMatrix4fv(glGetUniformLocation(shaders.composite, "modelToWorld"),
+        1, GL_TRUE, T(centerPosition.x, centerPosition.y, centerPosition.z).m);
+
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
@@ -112,6 +122,7 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const
                        1, GL_TRUE, worldToCamera.m);
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
+    */
 
     // Fifth pass, render to screen
     switchFramebuffer();
