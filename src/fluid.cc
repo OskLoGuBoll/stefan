@@ -38,15 +38,34 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const
     glUniformMatrix4fv(glGetUniformLocation(shaders.depth, "modelToWorld"),
                        1, GL_TRUE, T(centerPosition.x, centerPosition.y, centerPosition.z).m);
     glUniform1f(glGetUniformLocation(shaders.depth, "in_radius"), height/2);
-    glUniform1f(glGetUniformLocation(shaders.depth, "far"), frustumBounds.y);
-    glUniform1f(glGetUniformLocation(shaders.depth, "particleCount"), pointCloud.size());
     
     glBindVertexArray(vao);
     glDrawArrays(GL_POINTS, 0, pointCloud.size());
     glBindVertexArray(0);
     
+    // Second pass, thickness
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClear(GL_DEPTH_BUFFER_BIT); // we're not using the stencil buffer now
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE);
+
+    glUseProgram(shaders.thickness);
+
+    glUniformMatrix4fv(glGetUniformLocation(shaders.thickness, "cameraToView"),
+                       1, GL_TRUE, cameraToView.m);                                                
+    glUniformMatrix4fv(glGetUniformLocation(shaders.thickness, "worldToCamera"),
+                       1, GL_TRUE, worldToCamera.m);
+    glUniformMatrix4fv(glGetUniformLocation(shaders.thickness, "modelToWorld"),
+                       1, GL_TRUE, T(centerPosition.x, centerPosition.y, centerPosition.z).m);
+    glUniform1f(glGetUniformLocation(shaders.depth, "in_radius"), height/2);
     
-    // Second pass, blur
+    glBindVertexArray(vao);
+    glDrawArrays(GL_POINTS, 0, pointCloud.size());
+    glDisable(GL_BLEND);
+    glBindVertexArray(0);
+
+    // Third pass, blur
     switchFramebuffer();
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -68,8 +87,8 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const
     glUniform1f(glGetUniformLocation(shaders.blur, "far"), frustumBounds.y);
     
     glDrawArrays(GL_TRIANGLES, 0, 6);
-    
-    // Third pass, normal calculation
+
+    // Fourth pass, normal calculation
     
     switchFramebuffer();
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
@@ -92,7 +111,7 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
     
-    // Fourth pass, composite
+    // Fifth pass, composite
     
     switchFramebuffer();
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
@@ -128,7 +147,7 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const
     glDrawArrays(GL_TRIANGLES, 0, 6);
     
 
-    // Fifth pass, render to screen
+    // Sixth pass, render to screen
     switchFramebuffer();
     glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
     
