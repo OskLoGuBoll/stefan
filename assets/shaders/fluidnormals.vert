@@ -7,6 +7,6 @@ out vec2 ex_BufferCoord;
 
 void main()
 {
-    gl_Position = vec4(in_Position, 0.0, 1.0);
+    gl_Position = vec4(in_Position, -1.0, 1.0);
     ex_BufferCoord = in_TexCoords;
 }
