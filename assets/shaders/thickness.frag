@@ -29,7 +29,7 @@ void main(void)
     float depth = surfacePos.z / surfacePos.w;
     gl_FragDepth = depth * 0.5 + 0.5;
 
-    float thickness = 0.1;
+    float thickness = 0.3;
 
     out_color = vec4(0, thickness, 0, 1);
 }

@@ -13,7 +13,7 @@ uniform mat4 modelToWorld;
 uniform mat4 worldToCamera;
 uniform mat4 cameraToView;
 
-uniform float kValue = 1;
+uniform vec3 kValues = vec3(1, 100, 1);
 uniform vec3 lightDir1 = vec3(1,0,1);
 vec3 lightPos = vec3(200,10,0);
 
@@ -55,10 +55,10 @@ void main()
     vec3 reflectDir = reflect(-lightDir2, normal);
 
     // Phong shading
-    float diff = max(dot(normal, lightDir2), 0.0);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
+    float diff = kValues.x * max(dot(normal, lightDir2), 0.0);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), kValues.y);
 
-    vec3 ambient = 0.1 * color;
+    vec3 ambient = kValues.z * color;
     vec3 diffuse = diff * color;
     vec3 specular = spec * color;
 
