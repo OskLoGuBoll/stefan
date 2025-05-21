@@ -7,6 +7,7 @@ out vec4 FragColor;
 
 uniform sampler2D colorBuffer;
 uniform sampler2D screenDepth;
+uniform sampler2D depthMap;
 
 uniform mat4 modelToWorld;
 uniform mat4 worldToCamera;
@@ -38,8 +39,9 @@ void main()
     gl_FragDepth = depth;
     vec3 normal = texture(colorBuffer, ex_BufferCoord).rgb;
     normal = normalize(normal*2.0-1.0);
+    float blurredDepth = texture(depthMap, ex_BufferCoord).r;
 
-    vec3 reconstructedRay = reconstructWorldPosition(ex_Position,depth);
+    vec3 reconstructedRay = reconstructWorldPosition(ex_Position,blurredDepth);
 
     // Compute lighting
     lightPos = normalize(mat3(worldToCamera) * lightPos);

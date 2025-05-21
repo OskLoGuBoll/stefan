@@ -115,8 +115,12 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const
     glUniform1i(glGetUniformLocation(shaders.composite, "colorBuffer"), 0);
 
     glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
+    glUniform1i(glGetUniformLocation(shaders.composite, "depthMap"), 1);
+
+    glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, textureDepthbuffer);
-    glUniform1i(glGetUniformLocation(shaders.composite, "screenDepth"), 1);
+    glUniform1i(glGetUniformLocation(shaders.composite, "screenDepth"), 2);
 
     glUniformMatrix4fv(glGetUniformLocation(shaders.composite, "worldToCamera"),
                        1, GL_TRUE, worldToCamera.m);
