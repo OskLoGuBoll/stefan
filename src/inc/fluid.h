@@ -11,6 +11,7 @@ public:
     struct FluidShaders
     {
         GLuint depth;
+        GLuint thickness;
         GLuint blur;
         GLuint normal;
         GLuint composite;
