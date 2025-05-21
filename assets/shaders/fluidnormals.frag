@@ -2,7 +2,8 @@
 
 in vec2 ex_BufferCoord;
 
-out vec4 NormalColor;
+layout(location = 0) out vec4 out_color;
+layout(location = 1) out vec4 out_Normal;
 
 uniform sampler2D colorBuffer;
 uniform sampler2D screenDepth;
@@ -53,7 +54,8 @@ void main()
 
     vec3 normal = normalize(cross(ddx, ddy));
 
-    NormalColor = vec4(normal*0.5+0.5, 1);
+    out_Normal = vec4(normal*0.5+0.5, 1);
+    out_color = texture(colorBuffer, ex_BufferCoord);
 
 	gl_FragDepth = texture(screenDepth, ex_BufferCoord).r;
 }

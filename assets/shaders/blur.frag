@@ -1,7 +1,8 @@
 #version 430
 
 in vec2 ex_BufferCoord;
-out vec4 FragColor;
+layout(location = 0) out vec4 out_color;
+layout(location = 1) out vec4 out_Normal;
 
 uniform sampler2D colorBuffer;
 uniform sampler2D screenDepth;
@@ -56,7 +57,7 @@ void main()
 
     result /= totalWeight;
 
-    FragColor = result;
+    out_color = result;
 
 	gl_FragDepth = texture(screenDepth, ex_BufferCoord).r;
 }

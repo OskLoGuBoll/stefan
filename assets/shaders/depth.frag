@@ -8,7 +8,8 @@ in vec4 positionInView;
 in float distanceToCam;
 in float sphereRadius;
 
-out vec4 out_color;
+layout(location = 0) out vec4 out_color;
+layout(location = 1) out vec4 out_Normal;
 
 uniform mat4 cameraToView;
 uniform mat4 worldToCamera;

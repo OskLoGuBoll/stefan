@@ -37,12 +37,15 @@ private:
     GLuint framebufferA;
     GLuint textureColorbufferA;
     GLuint textureDepthbufferA;
+    GLuint textureNormalbufferA;
     GLuint framebufferB;
     GLuint textureColorbufferB;
     GLuint textureDepthbufferB;
+    GLuint textureNormalbufferB;
     GLuint framebuffer;
     GLuint textureDepthbuffer;
     GLuint textureColorbuffer;
+    GLuint textureNormalbuffer;
 
 
     GLuint vao;
