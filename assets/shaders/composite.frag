@@ -29,9 +29,16 @@ vec3 reconstructWorldPosition(vec2 ndc, float depth)
     return viewSpacePos.xyz;
 }
 
+vec3 Color(vec3 k, float thickness)
+{
+    return exp(-k * thickness);
+}
+
 void main()
 {
-    vec3 color = vec3(0.1, 0.5, 0.7);
+    float thickness = texture(depthMap, ex_BufferCoord).g;
+    vec3 absorption = vec3(0.9, 0.6, 0.1);
+    vec3 color = Color(absorption, thickness);
 
     float depth = texture(screenDepth, ex_BufferCoord).r;
     gl_FragDepth = depth;
@@ -55,6 +62,6 @@ void main()
     vec3 diffuse = diff * color;
     vec3 specular = spec * color;
 
-    vec3 finalColor = ambient + diffuse;
-    FragColor = vec4(finalColor, 1.0);
+    vec3 finalColor = ambient + diffuse + specular;
+    FragColor = vec4(finalColor, thickness);
 }
