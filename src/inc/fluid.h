@@ -29,6 +29,7 @@ public:
 
 private:
 
+    void initCompBuffers();
     void initBuffers();
     void initScreenSpaceQuad();
     void switchFramebuffer();
@@ -51,8 +52,13 @@ private:
 
     GLuint vao;
     GLuint quadVAO;
+
     GLuint posBuffer;
     GLuint velBuffer;
+    GLuint forceBuffer;
+    GLuint densityBuffer;
+    GLuint pressureBuffer;
+
 };
 
 #endif // FLUID_H
