@@ -25,6 +25,7 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const
     
     // First pass, depth
     switchFramebuffer();
+    
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // we're not using the stencil buffer now
@@ -37,7 +38,7 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const
                        1, GL_TRUE, worldToCamera.m);
     glUniformMatrix4fv(glGetUniformLocation(shaders.depth, "modelToWorld"),
                        1, GL_TRUE, T(centerPosition.x, centerPosition.y, centerPosition.z).m);
-    glUniform1f(glGetUniformLocation(shaders.depth, "in_radius"), height/4);
+    glUniform1f(glGetUniformLocation(shaders.depth, "in_radius"), height/2);
     
     glBindVertexArray(vao);
     glDrawArrays(GL_POINTS, 0, pointCloud.size());
@@ -64,7 +65,7 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const
     glDrawArrays(GL_POINTS, 0, pointCloud.size());
     glDisable(GL_BLEND);
     glBindVertexArray(0);
-
+    
     // Third pass, blur
     switchFramebuffer();
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
@@ -87,7 +88,7 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const
     glUniform1f(glGetUniformLocation(shaders.blur, "far"), frustumBounds.y);
     
     glDrawArrays(GL_TRIANGLES, 0, 6);
-
+    
     // Fourth pass, normal calculation
     
     switchFramebuffer();

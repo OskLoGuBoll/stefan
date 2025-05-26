@@ -39,7 +39,7 @@ void main()
     for (int i = 0; i < 7; ++i) {
         for (int j = 0; j < 7; ++j) 
         {
-            vec2 offset = vec2(gaussFilter[i].x, gaussFilter[j].x) * u_Scale * 2;
+            vec2 offset = vec2(gaussFilter[i].x, gaussFilter[j].x) * u_Scale * 6;
             vec2 sampleCoords = ex_BufferCoord + offset;
 
             vec4 sampleColor = texture(colorBuffer, sampleCoords);

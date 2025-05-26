@@ -13,23 +13,20 @@ uniform mat4 modelToWorld;
 uniform mat4 worldToCamera;
 uniform mat4 cameraToView;
 
-uniform vec3 kValues = vec3(1, 100, 1);
-uniform vec3 lightDir1 = vec3(1,0,1);
-vec3 lightPos = vec3(200,10,0);
+uniform vec4 kValues = vec4(1, 1, 1,100);
+vec3 lightPos = vec3(200,200,0);
 
 vec3 reconstructWorldPosition(vec2 ndc, float depth)
 {
-    // Convert to clip space
-    vec4 clipSpacePos = vec4(ndc, depth, 1.0);
+    vec4 screenSpacePos = vec4(ndc, depth, 1.0);
 
-    // Camera space
-    vec4 viewSpacePos = inverse(cameraToView) * clipSpacePos;
-    viewSpacePos /= viewSpacePos.w;
+    vec4 cameraSpacePos = inverse(cameraToView) * screenSpacePos;
+    cameraSpacePos /= cameraSpacePos.w;
 
-    return viewSpacePos.xyz;
+    return cameraSpacePos.xyz;
 }
 
-vec3 Color(vec3 k, float thickness)
+vec3 color(vec3 k, float thickness)
 {
     return exp(-k * thickness);
 }
@@ -38,7 +35,7 @@ void main()
 {
     float thickness = texture(depthMap, ex_BufferCoord).g;
     vec3 absorption = vec3(0.9, 0.6, 0.1);
-    vec3 color = Color(absorption, thickness);
+    vec3 color = color(absorption, thickness);
 
     float depth = texture(screenDepth, ex_BufferCoord).r;
     gl_FragDepth = depth;
@@ -46,7 +43,7 @@ void main()
     normal = normalize(normal*2.0-1.0);
     float blurredDepth = texture(depthMap, ex_BufferCoord).r;
 
-    vec3 reconstructedRay = reconstructWorldPosition(ex_Position,depth);
+    vec3 reconstructedRay = reconstructWorldPosition(ex_Position,blurredDepth);
 
     // Compute lighting
     vec3 newlightPos = ((worldToCamera) * vec4(lightPos,1)).xyz;
@@ -56,11 +53,11 @@ void main()
 
     // Phong shading
     float diff = kValues.x * max(dot(normal, lightDir2), 0.0);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), kValues.y);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), kValues.w);
 
-    vec3 ambient = kValues.z * color;
-    vec3 diffuse = diff * color;
-    vec3 specular = spec * color;
+    vec3 ambient = kValues.x * color;
+    vec3 diffuse = kValues.y * diff * color;
+    vec3 specular = kValues.z * spec * color;
 
     vec3 finalColor = ambient + diffuse + specular;
     FragColor = vec4(finalColor, thickness);

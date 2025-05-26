@@ -24,7 +24,6 @@ void main(void)
     normal.x = coord.x;
     normal.y = -coord.y;
     normal.z = sqrt(1.0 - dot(coord, coord));
-    normal = normal * 0.5 + 0.5;
 
     vec4 surfacePos = cameraToView * vec4(positionInView.xyz + normal, 1);
     
