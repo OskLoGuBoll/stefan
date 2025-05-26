@@ -29,9 +29,8 @@ float getLinearDepth(vec2 uv) {
 
 void main()
 {
-    // vec4 centerColor = texture(blurBuffer, ex_BufferCoord); // Used for full bilateral blur
     float centerDepth = getLinearDepth(ex_BufferCoord);
-	float depthParam = centerDepth * 0.2; // Should be uniform
+	float depthParam = centerDepth * 0.2; // Should maybe be uniform
 
     vec4 result = vec4(0.0);
     float totalWeight = 0.0;
