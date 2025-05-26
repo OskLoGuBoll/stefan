@@ -32,7 +32,7 @@ Demo::Demo()
 
 	glEnable(GL_DEBUG_OUTPUT);
 
-    world.addPointCloud("fluid1", std::make_unique<Fluid>(PointCloud{"assets/models/teapot.obj", 40}, Fluid::FluidShaders{
+    world.addPointCloud("fluid1", std::make_unique<Fluid>(PointCloud{"assets/models/teapot.obj", 60}, Fluid::FluidShaders{
                                                           assets.getShader("depth"),
                                                           assets.getShader("thickness"),
                                                           assets.getShader("blur"),

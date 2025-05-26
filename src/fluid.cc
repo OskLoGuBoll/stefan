@@ -59,7 +59,7 @@ void Fluid::draw(mat4 const& worldToCamera, mat4 const& cameraToView, vec2 const
                        1, GL_TRUE, worldToCamera.m);
     glUniformMatrix4fv(glGetUniformLocation(shaders.thickness, "modelToWorld"),
                        1, GL_TRUE, T(centerPosition.x, centerPosition.y, centerPosition.z).m);
-    glUniform1f(glGetUniformLocation(shaders.depth, "in_radius"), height/2);
+    glUniform1f(glGetUniformLocation(shaders.depth, "in_radius"), height/4);
     
     glBindVertexArray(vao);
     glDrawArrays(GL_POINTS, 0, pointCloud.size());
@@ -175,6 +175,7 @@ void Fluid::update(float const dt)
     glUseProgram(shaders.computeShader);
 
     glUniform1f(glGetUniformLocation(shaders.computeShader, "dt"), dt);
+    glUniform1i(glGetUniformLocation(shaders.computeShader, "numParticles"), pointCloud.size());
 
     glDispatchCompute((pointCloud.size() + 63) / 64, 1, 1);
 
@@ -186,37 +187,94 @@ Fluid::FluidShaders Fluid::getShaders() const
     return shaders;
 }
 
+void Fluid::initCompBuffers()
+{
+    glCreateBuffers(1, &posBuffer);
+    glCreateBuffers(1, &velBuffer);
+    glCreateBuffers(1, &forceBuffer);
+    glCreateBuffers(1, &densityBuffer);
+    glCreateBuffers(1, &pressureBuffer);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, posBuffer);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, 
+         pointCloud.size() * sizeof(vec4),
+         pointCloud.data(), 
+         GL_DYNAMIC_DRAW);
+
+    GLenum err = glGetError();
+    if (err != GL_NO_ERROR) {
+        std::cerr << "GL error after buffer init pos: " << std::hex << err << std::endl;
+    }
+
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, posBuffer);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, velBuffer);
+    std::vector<vec4> velocities(pointCloud.size(), vec4(0.0f));
+    glBufferData(GL_SHADER_STORAGE_BUFFER, 
+        velocities.size() * sizeof(vec4),
+        velocities.data(), 
+        GL_DYNAMIC_DRAW);
+
+    err = glGetError();
+    if (err != GL_NO_ERROR) {
+        std::cerr << "GL error after buffer init vel: " << std::hex << err << std::endl;
+    }
+
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, velBuffer);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, forceBuffer);
+    std::vector<vec4> forces(pointCloud.size(), vec4(0.0f));
+    glBufferData(GL_SHADER_STORAGE_BUFFER, 
+        forces.size() * sizeof(vec4),
+        forces.data(), 
+        GL_DYNAMIC_DRAW);
+
+    err = glGetError();
+    if (err != GL_NO_ERROR) {
+        std::cerr << "GL error after buffer init force: " << std::hex << err << std::endl;
+    }
+
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, forceBuffer);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, densityBuffer);
+    std::vector<float> densities(pointCloud.size(), 0.0f);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, 
+        densities.size() * sizeof(float),
+        densities.data(), 
+        GL_DYNAMIC_DRAW);
+
+    err = glGetError();
+    if (err != GL_NO_ERROR) {
+        std::cerr << "GL error after buffer init density: " << std::hex << err << std::endl;
+    }
+
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, densityBuffer);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, pressureBuffer);
+    std::vector<float> pressures(pointCloud.size(), 0.0f);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, 
+        pressures.size() * sizeof(float),
+        pressures.data(), 
+        GL_DYNAMIC_DRAW);
+
+    err = glGetError();
+    if (err != GL_NO_ERROR) {
+        std::cerr << "GL error after buffer init pressure: " << std::hex << err << std::endl;
+    }
+
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, pressureBuffer);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+}
+
 void Fluid::initBuffers()
 {
     glEnable(GL_PROGRAM_POINT_SIZE);
     glEnable(GL_POINT_SPRITE);
 
     glGenVertexArrays(1, &vao);
-    glCreateBuffers(1, &posBuffer);
-    glCreateBuffers(1, &velBuffer);
 
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, posBuffer);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, 
-         pointCloud.size() * sizeof(vec4),
-         pointCloud.data(), 
-         GL_DYNAMIC_DRAW);
-
-    std::vector<vec4> velocities(pointCloud.size(), vec4(0.0f));
-    
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> distr(-10, 10);
-
-    for (auto& v : velocities)
-    {
-        v = vec4(distr(gen), distr(gen), distr(gen), 1);
-    }
-
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, velBuffer);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, 
-        velocities.size() * sizeof(vec4),
-        velocities.data(), 
-        GL_DYNAMIC_DRAW);
+    initCompBuffers();
 
     glBindVertexArray(vao);
 
@@ -327,7 +385,6 @@ void Fluid::initBuffers()
 	    std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 
     initScreenSpaceQuad();
 }
