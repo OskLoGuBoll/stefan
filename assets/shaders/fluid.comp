@@ -10,32 +10,64 @@ layout(std430, binding = 1) buffer velBuffer {
     vec4 velocities[];
 };
 
+layout(std430, binding = 2) buffer forceBuffer {
+    vec4 forces[];
+};
+
+layout(std430, binding = 3) buffer densityBuffer {
+    float densities[];
+};
+
+layout(std430, binding = 4) buffer pressureBuffer {
+    float pressures[];
+};
+
+struct Particle {
+    vec3 position;
+    vec3 velocity;
+    vec3 force;
+    float density;
+    float pressure;
+};
+
 uniform float dt;
 uniform float elasticity = 0.7;
+uniform int numParticles;
 
 void main()
 {
     uint i = gl_GlobalInvocationID.x;
+    Particle p = Particle(positions[i].xyz,
+                            velocities[i].xyz,
+                            forces[i].xyz,
+                            densities[i],
+                            pressures[i]
+                            );
 
-    vec3 p = positions[i].xyz;
-    vec3 v = velocities[i].xyz;
+    p.density = 500.0;
 
-    v += vec3(0, -9.82*dt, 0);
+    densities[i] = p.density;
+    pressures[i] = p.pressure;
 
-    if (p.y + v.y*dt < 0)
-    {
-        v.y *= -elasticity;
-    }
-    if (p.x + v.x*dt < -8 || p.x + v.x*dt > 8)
-    {
-        v.x *= -elasticity;
-    }
-    if (p.z + v.z*dt < -8 || p.z + v.z*dt  > 8)
-    {
-        v.z *= -elasticity;
-    }
-    p += v*dt;
+    barrier(); // Ensure all densities are computed
 
-    positions[i] = vec4(p, 0);
-    velocities[i] = vec4(v, 0);
+    vec3 gravity = vec3(0, -9.82, 0);
+
+    p.force = gravity;
+
+    p.velocity += dt * p.force / p.density;
+
+    vec3 nextPos = p.position + p.velocity*dt;
+
+    if (nextPos.y < 0) p.velocity.y *= -elasticity;
+    if (nextPos.x < -8 || nextPos.x > 8) p.velocity.x *= -elasticity;
+    if (nextPos.z < -8 || nextPos.z > 8) p.velocity.z *= -elasticity;
+
+    p.position += p.velocity*dt;
+
+    positions[i] = vec4(p.position, 0);
+    velocities[i] = vec4(p.velocity, 0);
+    forces[i] = vec4(p.force, 0);
+    densities[i] = p.density;
+    pressures[i] = p.pressure;
 }

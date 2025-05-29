@@ -10,7 +10,7 @@ uniform mat4 modelToWorld;
 uniform mat4 worldToCamera;
 uniform mat4 cameraToView;
 
-uniform float in_radius = 800;
+uniform float in_radius = 200;
 
 void main(void)
 {

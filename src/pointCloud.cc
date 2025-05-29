@@ -1,6 +1,7 @@
 #include "pointCloud.h"
 
 #include <filesystem>
+#include <random>
 namespace fs = std::filesystem;
 
 PointCloud::PointCloud()
@@ -104,9 +105,13 @@ void PointCloud::BuildAABBTree()
 
 void PointCloud::Sampling(double const resolution)
 {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    
     BoundingBox bbox = tree.bbox();
-
+    
     double stepSize {std::min({bbox.xmax() - bbox.xmin(), bbox.ymax() - bbox.ymin(), bbox.zmax() - bbox.zmin()})/resolution};
+    std::uniform_int_distribution<> distr(-stepSize*10, stepSize*10);
 
     std::cout << "Stepsize: " << stepSize << std::endl;
 
@@ -116,7 +121,7 @@ void PointCloud::Sampling(double const resolution)
         {
             for (double z {bbox.zmin()}; z < bbox.zmax(); z+=stepSize)
             {
-                Point p(x, y, z);
+                Point p(x+distr(gen), y+distr(gen), z+distr(gen));
                 if ((*insideTester)(p) == CGAL::ON_BOUNDED_SIDE) {
                     pointCloud.push_back(vec4{p.x(), p.y(), p.z(), 0});
                 }
